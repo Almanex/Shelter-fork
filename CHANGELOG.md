@@ -1,3 +1,26 @@
+2.0 (Android 16 Fork)
+===
+
+**🚀 Major Android 16 Adaptation Release**
+
+- **Updated targetSDK to 36 (Android 16)** with full compatibility and optimization.
+- **Edge-to-Edge UI Implementation**: Complete redesign to support Android 16's mandatory edge-to-edge requirements.
+- **Predictive Back Navigation**: Implemented smooth back gesture animations and modern navigation patterns.
+- **Material You 3.0 Integration**: Enhanced theming with dynamic colors and adaptive design elements.
+- **Pixel 9a Optimization**: Hardware-specific optimizations for 6.3" display (2424×1080 resolution).
+- **Adaptive Icons Support**: Full compatibility with Android 16's adaptive icon system.
+- **Performance Enhancements**: Improved battery optimization and power management for extended usage.
+- **Gesture Navigation**: Optimized for modern Android navigation patterns and gestures.
+- **Enhanced Security**: Updated to leverage Android 16's improved Work Profile APIs and security features.
+- **Backward Compatibility**: Maintains full compatibility with previous Android versions while embracing new capabilities.
+
+**Technical Changes:**
+- Updated `compileSdk` and `targetSdkVersion` to 36
+- Implemented WindowInsets handling for edge-to-edge support
+- Added predictive back gesture support
+- Enhanced Material Design 3 components integration
+- Optimized for Pixel 9a hardware specifications
+
 1.9.1 (445)
 ===
 

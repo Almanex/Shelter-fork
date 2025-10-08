@@ -65,6 +65,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         });
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
         addPreferencesFromResource(R.xml.preferences_settings);

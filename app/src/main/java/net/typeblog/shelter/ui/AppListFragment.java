@@ -130,6 +130,7 @@ public class AppListFragment extends BaseFragment {
         mIsRemote = getArguments().getBoolean("is_remote");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onResume() {
         super.onResume();
@@ -144,6 +145,7 @@ public class AppListFragment extends BaseFragment {
         refresh();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onPause() {
         super.onPause();
@@ -472,6 +474,7 @@ public class AppListFragment extends BaseFragment {
         }
     }
 
+    @SuppressWarnings("deprecation")
     void installAppCallback(int result, ApplicationInfoWrapper app, boolean isInstall) {
         if (result == Activity.RESULT_OK) {
             String message = getString(isInstall ? R.string.clone_success : R.string.uninstall_success);

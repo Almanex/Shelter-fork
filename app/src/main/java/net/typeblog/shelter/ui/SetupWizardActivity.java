@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 // Removed setup-wizard-lib imports as library is not available
@@ -238,6 +239,24 @@ public class SetupWizardActivity extends AppCompatActivity {
             super.onViewCreated(view, savedInstanceState);
             TextView tv = view.findViewById(R.id.setup_wizard_generic_text);
             tv.setText(getTextRes());
+            
+            // Setup navigation buttons
+            Button buttonNext = view.findViewById(R.id.btn_next);
+            Button buttonBack = view.findViewById(R.id.btn_back);
+            
+            if (buttonNext != null) {
+                buttonNext.setOnClickListener(v -> onNavigateNext());
+            }
+            
+            if (buttonBack != null) {
+                buttonBack.setOnClickListener(v -> onNavigateBack());
+                // Show back button only if navigation back is supported
+                buttonBack.setVisibility(canNavigateBack() ? View.VISIBLE : View.GONE);
+            }
+        }
+        
+        protected boolean canNavigateBack() {
+            return true; // Override in fragments that don't support back navigation
         }
     }
 
@@ -250,6 +269,11 @@ public class SetupWizardActivity extends AppCompatActivity {
         @Override
         protected int getTextRes() {
             return R.string.setup_wizard_welcome_text;
+        }
+
+        @Override
+        protected boolean canNavigateBack() {
+            return false; // No back button on welcome screen
         }
 
         @Override

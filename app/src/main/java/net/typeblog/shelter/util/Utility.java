@@ -119,6 +119,7 @@ public class Utility {
     }
 
     // Enforce policies and configurations in the work profile
+    @SuppressWarnings("deprecation")
     public static void enforceWorkProfilePolicies(Context context) {
         DevicePolicyManager manager = context.getSystemService(DevicePolicyManager.class);
         ComponentName adminComponent = new ComponentName(context.getApplicationContext(), ShelterDeviceAdminReceiver.class);
@@ -229,6 +230,7 @@ public class Utility {
         manager.setProfileEnabled(adminComponent);
     }
 
+    @SuppressWarnings("deprecation")
     public static void enforceUserRestrictions(Context context) {
         DevicePolicyManager manager = context.getSystemService(DevicePolicyManager.class);
         ComponentName adminComponent = new ComponentName(context.getApplicationContext(), ShelterDeviceAdminReceiver.class);
@@ -299,6 +301,7 @@ public class Utility {
         LocalStorageManager.getInstance().setStringList(pref, list.toArray(new String[]{}));
     }
 
+    @SuppressWarnings("deprecation")
     public static void createLauncherShortcut(Context context, Intent launchIntent, Icon icon, String id, String label) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             ShortcutManager shortcutManager = context.getSystemService(ShortcutManager.class);
@@ -463,6 +466,7 @@ public class Utility {
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @SuppressWarnings("deprecation")
     private static Notification buildNotificationLollipop(Context context, boolean important, String ticker, String title, String desc, int icon) {
         return new Notification.Builder(context)
                 .setTicker(ticker)

@@ -92,14 +92,7 @@ public class FreezeService extends Service {
     private BroadcastReceiver mUnlockReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Cancel both JobScheduler job and AlarmManager alarm
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mJobScheduler != null) {
-                mJobScheduler.cancel(FREEZE_JOB_ID);
-            }
-            AlarmManager alarmManager = getSystemService(AlarmManager.class);
-            if (alarmManager != null) {
-                alarmManager.cancel(mFreezeWork);
-            }
+            mAlarmManager.cancel(mFreezeWork);
         }
     };
 

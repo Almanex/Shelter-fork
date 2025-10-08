@@ -25,6 +25,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -82,6 +85,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar(findViewById(R.id.main_toolbar));
+        
+        // Handle window insets for edge-to-edge design
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_appbar), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
+            return insets;
+        });
+        
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_bottom_navigation), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), systemBars.bottom);
+            return insets;
+        });
         mStorage = LocalStorageManager.getInstance();
 
         // Setup predictive back navigation for Android 16+
@@ -370,6 +386,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -395,6 +412,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onContextMenuClosed(Menu menu) {
         super.onContextMenuClosed(menu);
@@ -402,6 +420,7 @@ public class MainActivity extends AppCompatActivity {
                 .sendBroadcast(new Intent(BROADCAST_CONTEXT_MENU_CLOSED));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();

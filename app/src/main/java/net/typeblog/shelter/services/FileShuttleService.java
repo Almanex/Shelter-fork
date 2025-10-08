@@ -40,7 +40,7 @@ public class FileShuttleService extends Service {
     // Periodic task to stop the service when idle.
     // This service does not need to persist.
     private Runnable mSuicideTask = this::suicide;
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private Handler mHandler = new Handler(Looper.getMainLooper(), null);
     private IFileShuttleService.Stub mStub = new IFileShuttleService.Stub() {
         @Override
         public void ping() {
@@ -231,6 +231,7 @@ public class FileShuttleService extends Service {
         stopSelf();
     }
 
+    @SuppressWarnings("deprecation")
     private ParcelFileDescriptor loadImageThumbnail(String fullPath, Point sizeHint) {
         int id = Utility.getMediaStoreId(FileShuttleService.this, fullPath);
         if (id == -1) {
@@ -261,6 +262,7 @@ public class FileShuttleService extends Service {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private ParcelFileDescriptor loadVideoThumbnail(String fullPath) {
         // The MediaStore interface for video thumbnails just do not work at all
         // It can't even retrieve video IDs from the database
@@ -306,6 +308,7 @@ public class FileShuttleService extends Service {
         return pair[0];
     }
 
+    @SuppressWarnings("deprecation")
     private void notifyMediaScannerIfNecessary(File f, String mimeType) {
         // Notify the media scanner to scan the file as needed
         // This has to be done AFTER file creation

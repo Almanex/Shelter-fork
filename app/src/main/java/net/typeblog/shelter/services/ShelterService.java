@@ -311,6 +311,7 @@ public class ShelterService extends Service {
         return mBinder;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onUnbind(Intent intent) {
         // Stop our foreground notification (if it was created at all) when

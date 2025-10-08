@@ -3,14 +3,12 @@ package net.typeblog.shelter.ui;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class FinalizeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         Intent i = new Intent(getApplicationContext(), DummyActivity.class);
         i.setAction(DummyActivity.FINALIZE_PROVISION);

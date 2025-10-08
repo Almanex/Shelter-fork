@@ -14,6 +14,7 @@ public class ApplicationInfoWrapper implements Parcelable {
             return new ApplicationInfoWrapper[size];
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public ApplicationInfoWrapper createFromParcel(Parcel source) {
             ApplicationInfoWrapper info = new ApplicationInfoWrapper();

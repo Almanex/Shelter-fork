@@ -45,7 +45,7 @@ public class CrossProfileDocumentsProvider extends DocumentsProvider {
     };
 
     private IFileShuttleService mService = null;
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private Handler mHandler = new Handler(Looper.getMainLooper(), null);
     // Periodic task to release the handle to the service
     // Since DocumentsProvider may persist for a long time,
     // We just release the service when idle, thus enabling the
@@ -135,6 +135,7 @@ public class CrossProfileDocumentsProvider extends DocumentsProvider {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Cursor queryDocument(String documentId, String[] projection) {
         ensureServiceBound();
         final MatrixCursor result = new MatrixCursor(projection == null ? DEFAULT_DOCUMENT_PROJECTION : projection);
@@ -149,6 +150,7 @@ public class CrossProfileDocumentsProvider extends DocumentsProvider {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Cursor queryChildDocuments(String parentDocumentId, String[] projection, String sortOrder) {
         ensureServiceBound();
         List<Map<String, Serializable>> files;

@@ -22,6 +22,10 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -56,7 +60,7 @@ import java.util.UUID;
 // that might be required to perform across user profiles
 // which is only possible through Intents that are in
 // the crossProfileIntentFilter
-public class DummyActivity extends Activity {
+public class DummyActivity extends androidx.appcompat.app.AppCompatActivity {
     public static final String FINALIZE_PROVISION = "net.typeblog.shelter.action.FINALIZE_PROVISION";
     public static final String START_SERVICE = "net.typeblog.shelter.action.START_SERVICE";
     public static final String TRY_START_SERVICE = "net.typeblog.shelter.action.TRY_START_SERVICE";
@@ -88,7 +92,6 @@ public class DummyActivity extends Activity {
             UNINSTALL_PACKAGE,
             UNFREEZE_AND_LAUNCH);
 
-    private static final int REQUEST_INSTALL_PACKAGE = 1;
     private static final int REQUEST_PERMISSION_EXTERNAL_STORAGE= 2;
     private static final int REQUEST_PERMISSION_POST_NOTIFICATIONS = 3;
 
@@ -122,9 +125,21 @@ public class DummyActivity extends Activity {
 
     private boolean mIsProfileOwner = false;
     private DevicePolicyManager mPolicyManager = null;
+    private ActivityResultLauncher<Intent> mInstallPackageLauncher;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        // Initialize ActivityResultLauncher before super.onCreate()
+        mInstallPackageLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    appInstallFinished(result.getResultCode());
+                }
+            }
+        );
+        
         super.onCreate(savedInstanceState);
 
         mPolicyManager = getSystemService(DevicePolicyManager.class);
@@ -207,6 +222,7 @@ public class DummyActivity extends Activity {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -228,14 +244,8 @@ public class DummyActivity extends Activity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_INSTALL_PACKAGE) {
-            appInstallFinished(resultCode);
-        }
-    }
+    // Deprecated onActivityResult method replaced with ActivityResultLauncher
+    // The callback is now handled in mInstallPackageLauncher initialization
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -306,6 +316,7 @@ public class DummyActivity extends Activity {
         }, true);
     }
 
+    @SuppressWarnings("deprecation")
     private void actionInstallPackage() {
         Uri uri = null;
         if (getIntent().hasExtra("package")) {
@@ -349,7 +360,7 @@ public class DummyActivity extends Activity {
             intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
             intent.putExtra(Intent.EXTRA_RETURN_RESULT, true);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivityForResult(intent, REQUEST_INSTALL_PACKAGE);
+            mInstallPackageLauncher.launch(intent);
         }
 
         // Restore the VmPolicy anyway
@@ -411,6 +422,7 @@ public class DummyActivity extends Activity {
         }).start();
     }
 
+    @SuppressWarnings("deprecation")
     private void actionUninstallPackage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             actionUninstallPackageQ();
@@ -426,7 +438,7 @@ public class DummyActivity extends Activity {
         // with the result code.
         // If ANY separate logic is added for any of them,
         // the request code should be separated.
-        startActivityForResult(intent, REQUEST_INSTALL_PACKAGE);
+        mInstallPackageLauncher.launch(intent);
     }
 
     private void actionUninstallPackageQ() {

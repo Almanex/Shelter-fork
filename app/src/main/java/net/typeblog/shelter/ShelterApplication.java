@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 
-import net.typeblog.shelter.services.FileShuttleService;
 import net.typeblog.shelter.services.ShelterService;
 import net.typeblog.shelter.util.LocalStorageManager;
 import net.typeblog.shelter.util.SettingsManager;
 
 public class ShelterApplication extends Application {
     private ServiceConnection mShelterServiceConnection = null;
-    private ServiceConnection mFileShuttleServiceConnection = null;
 
     @Override
     public void onCreate() {
@@ -29,13 +27,6 @@ public class ShelterApplication extends Application {
         mShelterServiceConnection = conn;
     }
 
-    public void bindFileShuttleService(ServiceConnection conn) {
-        unbindFileShuttleService();;
-        Intent intent = new Intent(getApplicationContext(), FileShuttleService.class);
-        bindService(intent, conn, Context.BIND_AUTO_CREATE);
-        mFileShuttleServiceConnection = conn;
-    }
-
     public void unbindShelterService() {
         if (mShelterServiceConnection != null) {
             try {
@@ -48,17 +39,5 @@ public class ShelterApplication extends Application {
         }
 
         mShelterServiceConnection = null;
-    }
-
-    public void unbindFileShuttleService() {
-        if (mFileShuttleServiceConnection != null) {
-            try {
-                unbindService(mFileShuttleServiceConnection);
-            } catch (Exception e) {
-                // ...
-            }
-        }
-
-        mFileShuttleServiceConnection = null;
     }
 }

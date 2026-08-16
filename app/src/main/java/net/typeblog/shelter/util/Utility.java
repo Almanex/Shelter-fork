@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Environment;
+import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -165,16 +166,6 @@ public class Utility {
 
         manager.addCrossProfileIntentFilter(
                 adminComponent,
-                new IntentFilter(DummyActivity.START_FILE_SHUTTLE),
-                DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
-
-        manager.addCrossProfileIntentFilter(
-                adminComponent,
-                new IntentFilter(DummyActivity.START_FILE_SHUTTLE_2),
-                DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
-
-        manager.addCrossProfileIntentFilter(
-                adminComponent,
                 new IntentFilter(DummyActivity.SYNCHRONIZE_PREFERENCE),
                 DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
 
@@ -189,21 +180,63 @@ public class Utility {
                 new IntentFilter(DummyActivity.UNINSTALL_PACKAGE),
                 DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
 
-        // Allow ACTION_SEND and ACTION_SEND_MULTIPLE to cross from managed to parent
+        // Allow bidirectional ACTION_SEND and ACTION_SEND_MULTIPLE (System Share Sheet)
         IntentFilter actionSendFilter = new IntentFilter();
         actionSendFilter.addAction(Intent.ACTION_SEND);
         actionSendFilter.addAction(Intent.ACTION_SEND_MULTIPLE);
         try {
             actionSendFilter.addDataType("*/*");
         } catch (IntentFilter.MalformedMimeTypeException ignored) {
-            // WTF?
         }
         actionSendFilter.addCategory(Intent.CATEGORY_DEFAULT);
         manager.addCrossProfileIntentFilter(
                 adminComponent,
                 actionSendFilter,
                 DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
-        
+        manager.addCrossProfileIntentFilter(
+                adminComponent,
+                actionSendFilter,
+                DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
+
+        // Allow bidirectional document and content pickers (DocumentsUI, Open/Get/Create Document)
+        IntentFilter actionDocFilter = new IntentFilter();
+        actionDocFilter.addAction(Intent.ACTION_GET_CONTENT);
+        actionDocFilter.addAction(Intent.ACTION_OPEN_DOCUMENT);
+        actionDocFilter.addAction(Intent.ACTION_CREATE_DOCUMENT);
+        actionDocFilter.addAction(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        try {
+            actionDocFilter.addDataType("*/*");
+        } catch (IntentFilter.MalformedMimeTypeException ignored) {
+        }
+        actionDocFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        actionDocFilter.addCategory(Intent.CATEGORY_OPENABLE);
+        manager.addCrossProfileIntentFilter(
+                adminComponent,
+                actionDocFilter,
+                DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
+        manager.addCrossProfileIntentFilter(
+                adminComponent,
+                actionDocFilter,
+                DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
+
+        // Allow modern Photo Picker and Camera capturing
+        IntentFilter actionMediaFilter = new IntentFilter();
+        actionMediaFilter.addAction(MediaStore.ACTION_IMAGE_CAPTURE);
+        actionMediaFilter.addAction(MediaStore.ACTION_IMAGE_CAPTURE_SECURE);
+        actionMediaFilter.addAction(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            actionMediaFilter.addAction(MediaStore.ACTION_PICK_IMAGES);
+        }
+        actionMediaFilter.addCategory(Intent.CATEGORY_DEFAULT);
+        manager.addCrossProfileIntentFilter(
+                adminComponent,
+                actionMediaFilter,
+                DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
+        manager.addCrossProfileIntentFilter(
+                adminComponent,
+                actionMediaFilter,
+                DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
+
         // Browser intents are allowed from work profile to parent
         IntentFilter browsableIntentFilter = new IntentFilter(Intent.ACTION_VIEW);
         browsableIntentFilter.addCategory(Intent.CATEGORY_BROWSABLE);
@@ -281,16 +314,22 @@ public class Utility {
     public static void killShelterServices(IShelterService serviceMain, IShelterService serviceWork) {
         // Ensure that all our other services are killed at this point
         try {
-            serviceWork.stopShelterService(true);
+            if (serviceWork != null) serviceWork.stopShelterService(true);
         } catch (Exception e) {
             // We are stopping anyway
         }
 
         try {
-            serviceMain.stopShelterService(false);
+            if (serviceMain != null) serviceMain.stopShelterService(false);
         } catch (Exception e) {
             // We are stopping anyway
         }
+    }
+
+    // Get all profiles of the current user, including Work Profile and Private Space
+    public static List<UserHandle> getAllProfiles(Context context) {
+        UserManager um = context.getSystemService(UserManager.class);
+        return um.getUserProfiles();
     }
 
     // Delete apps that no longer exist from the auto freeze list

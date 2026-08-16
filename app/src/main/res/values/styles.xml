@@ -3,22 +3,24 @@
     <style name="AppTheme.Base" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorOnPrimary">@color/colorTextPrimary</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:colorBackground">@color/colorPrimary</item>
-        <item name="android:textColor">@color/colorTextPrimary</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
         <item name="android:textColorSecondary">@color/colorTextSecondary</item>
-        <item name="android:itemBackground">@color/colorPrimary</item>
-        <item name="android:listViewStyle">@style/ListViewTheme</item>
-        <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/AlertDialogTheme</item>
+        <item name="android:popupMenuStyle">@style/Widget.Material3.PopupMenu</item>
+        <item name="popupMenuStyle">@style/Widget.Material3.PopupMenu</item>
+        <item name="preferenceCategoryStyle">@style/PreferenceCategoryStyle</item>
         <!-- Edge-to-edge support -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:enforceStatusBarContrast" tools:targetApi="api_level_29">false</item>
-        <item name="android:enforceNavigationBarContrast" tools:targetApi="api_level_29">false</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="29">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="29">false</item>
     </style>
 
     <style name="AppTheme.Override" parent="AppTheme.Base">
@@ -47,6 +49,10 @@
         <item name="colorOnSurface">#1C1B1F</item>
         <item name="colorSurfaceVariant">#E7E0EC</item>
         <item name="colorOnSurfaceVariant">#49454F</item>
+        <item name="colorSurfaceContainer">#F0F4F8</item>
+        <item name="colorSurfaceContainerHigh">#E2E8F0</item>
+        <item name="colorBackgroundFloating">#FFFBFE</item>
+        <item name="android:colorBackgroundFloating">#FFFBFE</item>
         
         <!-- Background colors -->
         <item name="android:colorBackground">#FFFBFE</item>
@@ -55,38 +61,41 @@
         <!-- Enhanced edge-to-edge support -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:enforceStatusBarContrast" tools:targetApi="api_level_35">false</item>
-        <item name="android:enforceNavigationBarContrast" tools:targetApi="api_level_35">false</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="35">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="35">false</item>
     </style>
 
     <!-- Themes for dialogs and context menus -->
-    <style name="ListViewTheme" parent="@android:style/Widget.ListView">
-        <item name="android:background">@color/colorPrimary</item>
-    </style>
-
-    <style name="AlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
-        <item name="android:background">@color/colorPrimary</item>
-        <item name="android:headerBackground">@color/colorPrimary</item>
+    <style name="AlertDialogTheme" parent="Theme.Material3.DayNight.Dialog.Alert">
         <item name="android:windowTitleStyle">@style/AlertDialogTitleTextStyle</item>
     </style>
 
-    <style name="AlertDialogTitleTextStyle" parent="TextAppearance.AppCompat.Title">
-        <item name="android:background">@color/colorPrimary</item>
+    <style name="AlertDialogTitleTextStyle" parent="TextAppearance.Material3.TitleLarge">
+    </style>
+
+    <style name="PreferenceCategoryStyle" parent="Preference.Category.Material">
+        <item name="android:layout">@layout/preference_category_material</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="allowDividerBelow">false</item>
+        <item name="allowDividerAbove">false</item>
     </style>
 
     <!-- Theme for ActionBar -->
     <!-- Display the text as accent color -->
-    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
-        <item name="android:textColorPrimary">@color/colorAccent</item>
+    <style name="ToolbarTheme" parent="ThemeOverlay.Material3.ActionBar">
+        <item name="android:textColorPrimary">?attr/colorAccent</item>
     </style>
 
-    <!-- For DummyActivity -->
-    <style name="Theme.AppCompat.Translucent.NoTitleBar" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- For DummyActivity and FinalizeActivity -->
+    <style name="Theme.Shelter.Translucent" parent="AppTheme">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
     </style>
+
+    <style name="Theme.AppCompat.Translucent.NoTitleBar" parent="Theme.Shelter.Translucent" />
 
 </resources>

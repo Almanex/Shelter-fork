@@ -13,14 +13,15 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.preference.CheckBoxPreference;
 import androidx.preference.DropDownPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import net.typeblog.shelter.R;
 import net.typeblog.shelter.services.IShelterService;
@@ -47,22 +48,26 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     private SettingsManager mManager = SettingsManager.getInstance();
     private IShelterService mServiceWork = null;
 
-    private CheckBoxPreference mPrefCrossProfileFileChooser = null;
-    private CheckBoxPreference mPrefBlockContactsSearching = null;
-    private CheckBoxPreference mPrefAutoFreezeService = null;
-    private CheckBoxPreference mPrefSkipForeground = null;
-    private CheckBoxPreference mPrefPaymentStub = null;
+    private SwitchPreferenceCompat mPrefCrossProfileFileChooser = null;
+    private SwitchPreferenceCompat mPrefBlockContactsSearching = null;
+    private SwitchPreferenceCompat mPrefAutoFreezeService = null;
+    private SwitchPreferenceCompat mPrefSkipForeground = null;
+    private SwitchPreferenceCompat mPrefPaymentStub = null;
 
     private DropDownPreference mPrefAutoFreezeDelay = null;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ViewCompat.setOnApplyWindowInsetsListener(view.findViewById(androidx.preference.R.id.recycler_view), (v, windowInsets) -> {
-            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPaddingRelative(0, 0, 0, insets.bottom);
-            return WindowInsetsCompat.CONSUMED;
-        });
+        RecyclerView recyclerView = view.findViewById(androidx.preference.R.id.recycler_view);
+        if (recyclerView != null) {
+            recyclerView.addItemDecoration(new SettingsCardDecoration(requireContext()));
+            ViewCompat.setOnApplyWindowInsetsListener(recyclerView, (v, windowInsets) -> {
+                Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPaddingRelative(0, 0, 0, insets.bottom);
+                return WindowInsetsCompat.CONSUMED;
+            });
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -92,18 +97,18 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                 .setOnPreferenceClickListener(this::openSummaryUrl);
 
         // === Interactions ===
-        mPrefCrossProfileFileChooser = (CheckBoxPreference) findPreference(SETTINGS_CROSS_PROFILE_FILE_CHOOSER);
+        mPrefCrossProfileFileChooser = (SwitchPreferenceCompat) findPreference(SETTINGS_CROSS_PROFILE_FILE_CHOOSER);
         mPrefCrossProfileFileChooser.setChecked(mManager.getCrossProfileFileChooserEnabled());
         mPrefCrossProfileFileChooser.setOnPreferenceChangeListener(this);
-        mPrefBlockContactsSearching = (CheckBoxPreference) findPreference(SETTINGS_BLOCK_CONTACTS_SEARCHING);
+        mPrefBlockContactsSearching = (SwitchPreferenceCompat) findPreference(SETTINGS_BLOCK_CONTACTS_SEARCHING);
         mPrefBlockContactsSearching.setChecked(mManager.getBlockContactsSearchingEnabled());
         mPrefBlockContactsSearching.setOnPreferenceChangeListener(this);
-        mPrefPaymentStub = (CheckBoxPreference) findPreference(SETTINGS_PAYMENT_STUB);
+        mPrefPaymentStub = (SwitchPreferenceCompat) findPreference(SETTINGS_PAYMENT_STUB);
         mPrefPaymentStub.setChecked(mManager.getPaymentStubEnabled());
         mPrefPaymentStub.setOnPreferenceChangeListener(this);
 
         // === Services ===
-        mPrefAutoFreezeService = (CheckBoxPreference) findPreference(SETTINGS_AUTO_FREEZE_SERVICE);
+        mPrefAutoFreezeService = (SwitchPreferenceCompat) findPreference(SETTINGS_AUTO_FREEZE_SERVICE);
         mPrefAutoFreezeService.setChecked(mManager.getAutoFreezeServiceEnabled());
         mPrefAutoFreezeService.setOnPreferenceChangeListener(this);
         mPrefAutoFreezeDelay = findPreference(SETTINGS_AUTO_FREEZE_DELAY);
@@ -111,23 +116,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         mPrefAutoFreezeDelay.setEntries(Arrays.stream(AUTO_FREEZE_DELAY_SECONDS).mapToObj((it) -> getString(R.string.format_minutes, it / 60)).toArray(String[]::new));
         mPrefAutoFreezeDelay.setEntryValues(Arrays.stream(AUTO_FREEZE_DELAY_SECONDS).mapToObj(String::valueOf).toArray(String[]::new));
         updateAutoFreezeDelay();
-        mPrefSkipForeground = (CheckBoxPreference) findPreference(SETTINGS_SKIP_FOREGROUND);
+        mPrefSkipForeground = (SwitchPreferenceCompat) findPreference(SETTINGS_SKIP_FOREGROUND);
         mPrefSkipForeground.setChecked(mManager.getSkipForegroundEnabled());
         mPrefSkipForeground.setOnPreferenceChangeListener(this);
-
-        // Disable FileSuttle on Q for now
-        // Supported on R and beyond
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-            mPrefCrossProfileFileChooser.setEnabled(false);
-        }
-
-        // Disable FileShuttle for Android Go
-        // as it requires SYSTEM_ALERT_WINDOW which
-        // is not allowed on Go devices
-        ActivityManager am = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
-        if (am.isLowRamDevice()) {
-            mPrefCrossProfileFileChooser.setEnabled(false);
-        }
     }
 
     @Override
@@ -154,46 +145,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
     public boolean onPreferenceChange(Preference preference, Object newState) {
         if (preference == mPrefCrossProfileFileChooser) {
             boolean enabled = (boolean) newState;
-            if (!enabled) {
-                mManager.setCrossProfileFileChooserEnabled(false);
-                return true;
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // Request all files permission on R and beyond
-                boolean hasPermission = ensureSpecialAccessPermission(() -> {
-                    try {
-                        return mServiceWork.hasAllFileAccessPermission() && Utility.checkAllFileAccessPermission();
-                    } catch (RemoteException e) {
-                        return false;
-                    }
-                }, R.string.request_storage_manager, Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-
-                if (!hasPermission) {
-                    return false;
-                }
-
-                // Also needs system alert window permission
-                // because File Shuttle needs to start activities in the background
-                // We cannot do the same notification trick as in initial setup
-                // because it would be too annoying having to click a notification
-                // every time a user tries to use File Shuttle.
-                // NOTE: Enabling this permission may mask some bugs with background
-                // activities. Always test with this disabled.
-                hasPermission = ensureSpecialAccessPermission(() -> {
-                    try {
-                        return mServiceWork.hasSystemAlertPermission() && Utility.checkSystemAlertPermission(getContext());
-                    } catch (RemoteException e) {
-                        return false;
-                    }
-                }, R.string.request_system_alert, Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-
-                if (!hasPermission) {
-                    return false;
-                }
-            }
-
-            mManager.setCrossProfileFileChooserEnabled(true);
+            mManager.setCrossProfileFileChooserEnabled(enabled);
             return true;
         } else if (preference == mPrefBlockContactsSearching) {
             mManager.setBlockContactsSearchingEnabled((boolean) newState);
@@ -239,7 +191,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
     private boolean ensureSpecialAccessPermission(CheckPermissionCallback checkPermission, int alertRes, String settingsAction) {
         if (!checkPermission.check()) {
-            new AlertDialog.Builder(getContext())
+            new MaterialAlertDialogBuilder(requireContext())
                     .setMessage(alertRes)
                     .setPositiveButton(android.R.string.ok,
                             (dialog, which) -> startActivity(new Intent(settingsAction)))

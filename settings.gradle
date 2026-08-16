@@ -1,4 +1,4 @@
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.10.0'
+}
 include ':app'
-include ':setup-wizard-lib'
-project(':setup-wizard-lib').projectDir = new File('./libs/SetupWizardLibrary/library')
-project(':setup-wizard-lib').buildFileName = 'standalone.gradle'

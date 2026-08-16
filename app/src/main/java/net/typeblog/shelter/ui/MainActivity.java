@@ -9,8 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.window.OnBackInvokedCallback;
-import android.window.OnBackInvokedDispatcher;
 import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,11 +16,13 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.graphics.Insets;
@@ -33,7 +33,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import net.typeblog.shelter.R;
 import net.typeblog.shelter.ShelterApplication;
@@ -60,6 +61,34 @@ public class MainActivity extends AppCompatActivity {
                             new ActivityResultContracts.OpenDocument(),
                             new String[]{"application/vnd.android.package-archive"}),
                     this::onApkSelected);
+    private final ActivityResultLauncher<PickVisualMediaRequest> mPhotoPicker =
+            registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                if (uri != null) {
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("image/*");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to_cross_profile)));
+                }
+            });
+    private final ActivityResultLauncher<String[]> mShareFilesPicker =
+            registerForActivityResult(new ActivityResultContracts.OpenMultipleDocuments(), uris -> {
+                if (uris != null && !uris.isEmpty()) {
+                    if (uris.size() == 1) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("*/*");
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, uris.get(0));
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to_cross_profile)));
+                    } else {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                        shareIntent.setType("*/*");
+                        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, new java.util.ArrayList<>(uris));
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to_cross_profile)));
+                    }
+                }
+            });
     // Logic of the following intents are quite complicated; use the generic contract for more control
     private final ActivityResultLauncher<Intent> mTryStartWorkService =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::tryStartWorkServiceCb);
@@ -93,25 +122,20 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_bottom_navigation), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_tabs), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), systemBars.bottom);
             return insets;
         });
         mStorage = LocalStorageManager.getInstance();
 
-        // Setup predictive back navigation for Android 16+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
-                OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                new OnBackInvokedCallback() {
-                    @Override
-                    public void onBackInvoked() {
-                        finish();
-                    }
-                }
-            );
-        }
+        // Setup predictive back navigation using OnBackPressedDispatcher
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                finish();
+            }
+        });
 
         if (getSystemService(DevicePolicyManager.class).isProfileOwnerApp(getPackageName())) {
             // We are now in our own profile
@@ -216,6 +240,8 @@ public class MainActivity extends AppCompatActivity {
             registerStartActivityProxies();
             startKiller();
             buildView();
+            LocalBroadcastManager.getInstance(this)
+                    .sendBroadcast(new Intent(AppListFragment.BROADCAST_REFRESH));
         }
     }
 
@@ -236,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
         // Finally we can build the view
         // Find all the views
         ViewPager2 pager = findViewById(R.id.main_pager);
-        BottomNavigationView nav = findViewById(R.id.main_bottom_navigation);
+        TabLayout tabs = findViewById(R.id.main_tabs);
 
         // Initialize the ViewPager and the tab
         // All the remaining work will be done in the fragments
@@ -258,25 +284,21 @@ public class MainActivity extends AppCompatActivity {
                 return 2;
             }
         });
-        pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                int[] menuIds = new int[]{
-                        R.id.bottom_navigation_main,
-                        R.id.bottom_navigation_work
-                };
-                nav.setSelectedItemId(menuIds[position]);
+        pager.setOffscreenPageLimit(1);
+
+        new TabLayoutMediator(tabs, pager, (tab, position) -> {
+            if (position == 0) {
+                tab.setText(R.string.fragment_profile_main);
+                tab.setIcon(R.drawable.ic_home);
+            } else {
+                tab.setText(R.string.fragment_profile_work);
+                tab.setIcon(R.drawable.ic_work);
             }
-        });
-        nav.setOnItemSelectedListener((MenuItem item) -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.bottom_navigation_main) {
-                pager.setCurrentItem(0);
-            } else if (itemId == R.id.bottom_navigation_work) {
-                pager.setCurrentItem(1);
-            }
-            return true;
-        });
+        }).attach();
+    }
+
+    public IShelterService getService(boolean isRemote) {
+        return isRemote ? mServiceWork : mServiceMain;
     }
 
     // Get the service on the other side
@@ -284,6 +306,11 @@ public class MainActivity extends AppCompatActivity {
     // main -> remote (work)
     IShelterService getOtherService(boolean isRemote) {
         return isRemote ? mServiceMain : mServiceWork;
+    }
+
+    public void rebindWorkService() {
+        mServiceWork = null;
+        tryStartWorkService();
     }
 
     boolean servicesAlive() {
@@ -458,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
             };
 
             if (!item.isChecked()) {
-                new AlertDialog.Builder(this)
+                new MaterialAlertDialogBuilder(this)
                         .setMessage(R.string.show_all_warning)
                         .setPositiveButton(R.string.first_run_alert_continue,
                                 (dialog, which) -> update.run())
@@ -467,6 +494,14 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 update.run();
             }
+            return true;
+        } else if (itemId == R.id.main_menu_photo_picker) {
+            mPhotoPicker.launch(new PickVisualMediaRequest.Builder()
+                    .setMediaType(ActivityResultContracts.PickVisualMedia.ImageAndVideo.INSTANCE)
+                    .build());
+            return true;
+        } else if (itemId == R.id.main_menu_share_files) {
+            mShareFilesPicker.launch(new String[]{"*/*"});
             return true;
         } else if (itemId == R.id.main_menu_documents_ui) {
             Intent documentsUiIntent = new Intent(Intent.ACTION_VIEW);

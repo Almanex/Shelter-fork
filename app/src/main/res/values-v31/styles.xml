@@ -22,15 +22,19 @@
         <item name="colorOnSurface">@android:color/system_neutral1_900</item>
         <item name="colorSurfaceVariant">@android:color/system_neutral2_100</item>
         <item name="colorOnSurfaceVariant">@android:color/system_neutral2_700</item>
+        <item name="colorSurfaceContainer">@android:color/system_neutral1_100</item>
+        <item name="colorSurfaceContainerHigh">@android:color/system_neutral1_200</item>
+        <item name="colorBackgroundFloating">@android:color/system_neutral1_100</item>
+        <item name="android:colorBackgroundFloating">@android:color/system_neutral1_100</item>
         
         <!-- Background colors -->
-        <item name="android:colorBackground">@android:color/system_neutral1_0</item>
-        <item name="colorOnBackground">@android:color/system_neutral1_900</item>
+        <item name="android:colorBackground">@color/colorPrimary</item>
+        <item name="colorOnBackground">@color/colorTextPrimary</item>
         
         <!-- Enhanced edge-to-edge support -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:enforceStatusBarContrast" tools:targetApi="api_level_35">false</item>
-        <item name="android:enforceNavigationBarContrast" tools:targetApi="api_level_35">false</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="35">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="35">false</item>
     </style>
 </resources>

@@ -129,4 +129,14 @@
     <string name="allow_cross_profile_interaction">Разрешить работу между профилями</string>
     <string name="settings_payment_stub_desc">Чтобы получить возможность выбрать платёжное приложение внутри рабочего профиля в Настройки - NFC, включите фальшивый платёжный сервис NFC в основном профиле. Это временное решение ошибки Android, из-за которой невозможно выбрать платёжное приложение внутри рабочего профиля, если в основном профиле таких нет.</string>
     <string name="settings_payment_stub">Заглушка платёжных сервисов</string>
+    <string name="tile_freeze_all_label">Заморозить все</string>
+    <string name="tile_work_profile_label">Рабочий профиль</string>
+    <string name="tile_work_profile_state_on">Включён</string>
+    <string name="tile_work_profile_state_off">Выключен</string>
+    <string name="tile_work_profile_not_setup">Не настроен</string>
+    <string name="main_menu_photo_picker">Выбор фото и медиа (Photo Picker)</string>
+    <string name="main_menu_share_files">Передать файлы между профилями</string>
+    <string name="share_to_cross_profile">Поделиться между профилями</string>
+    <string name="settings_cross_profile_sharing">Межпрофильный обмен файлами и медиа</string>
+    <string name="settings_cross_profile_sharing_desc">Разрешить передачу файлов, фото и документов между основным профилем и Shelter через системный интерфейс «Поделиться» и проводник без опасных разрешений.</string>
 </resources>

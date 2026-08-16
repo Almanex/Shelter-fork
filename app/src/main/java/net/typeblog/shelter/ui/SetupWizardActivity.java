@@ -1,6 +1,7 @@
 package net.typeblog.shelter.ui;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
@@ -63,6 +64,15 @@ public class SetupWizardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_setup_wizard);
         mPolicyManager = getSystemService(DevicePolicyManager.class);
         mStorage = LocalStorageManager.getInstance();
+
+        // Predictive back support
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                finishWithResult(false);
+            }
+        });
+
         // Don't use switchToFragment for the first time
         // because we don't want animation for the first fragment
         // (it would have nothing to animate upon, resulting in a black background)

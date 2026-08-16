@@ -244,6 +244,10 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         mDefaultIcon = defaultIcon;
     }
 
+    void setService(IShelterService service) {
+        mService = service;
+    }
+
     void setContextMenuHandler(ContextMenuHandler handler) {
         mContextMenuHandler = handler;
     }

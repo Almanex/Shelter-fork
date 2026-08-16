@@ -1,45 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.preference.PreferenceCategory
         android:title="@string/settings_interaction">
 
-        <androidx.preference.CheckBoxPreference
+        <androidx.preference.SwitchPreferenceCompat
             android:key="settings_cross_profile_file_chooser"
-            android:title="@string/settings_cross_profile_file_chooser"
-            android:summary="@string/settings_cross_profile_file_chooser_desc" />
+            android:title="@string/settings_cross_profile_sharing"
+            android:summary="@string/settings_cross_profile_sharing_desc"
+            app:icon="@drawable/ic_sync_alt" />
 
-        <androidx.preference.CheckBoxPreference
+        <androidx.preference.SwitchPreferenceCompat
             android:key="settings_block_contacts_searching"
             android:title="@string/settings_block_contacts_searching"
-            android:summary="@string/settings_block_contacts_searching_desc" />
+            android:summary="@string/settings_block_contacts_searching_desc"
+            app:icon="@drawable/ic_contacts_search" />
 
-        <androidx.preference.CheckBoxPreference
+        <androidx.preference.SwitchPreferenceCompat
             android:key="settings_payment_stub"
             android:title="@string/settings_payment_stub"
-            android:summary="@string/settings_payment_stub_desc" />
+            android:summary="@string/settings_payment_stub_desc"
+            app:icon="@drawable/ic_payment_card" />
 
     </androidx.preference.PreferenceCategory>
 
     <androidx.preference.PreferenceCategory
         android:title="@string/settings_services">
 
-        <androidx.preference.CheckBoxPreference
+        <androidx.preference.SwitchPreferenceCompat
             android:key="settings_auto_freeze_service"
             android:title="@string/settings_auto_freeze_service"
-            android:summary="@string/settings_auto_freeze_service_desc" />
+            android:summary="@string/settings_auto_freeze_service_desc"
+            app:icon="@drawable/ic_freeze_tinted" />
 
         <androidx.preference.DropDownPreference
             android:dependency="settings_auto_freeze_service"
             android:key="settings_auto_freeze_delay"
-            android:title="@string/settings_auto_freeze_delay" />
+            android:title="@string/settings_auto_freeze_delay"
+            app:icon="@drawable/ic_timer_delay" />
 
-        <androidx.preference.CheckBoxPreference
+        <androidx.preference.SwitchPreferenceCompat
             android:dependency="settings_auto_freeze_service"
             android:key="settings_dont_freeze_foreground"
             android:title="@string/settings_dont_freeze_foreground"
-            android:summary="@string/settings_dont_freeze_foreground_desc" />
+            android:summary="@string/settings_dont_freeze_foreground_desc"
+            app:icon="@drawable/ic_app_blocking" />
 
     </androidx.preference.PreferenceCategory>
 
@@ -48,27 +55,32 @@
 
         <androidx.preference.Preference
             android:key="settings_version"
-            android:title="@string/settings_version" />
+            android:title="@string/settings_version"
+            app:icon="@drawable/ic_info_outline" />
 
         <androidx.preference.Preference
             android:key="settings_source_code"
             android:title="@string/settings_source_code"
-            android:summary="@string/settings_source_code_url" />
+            android:summary="@string/settings_source_code_url"
+            app:icon="@drawable/ic_code_branch" />
 
         <androidx.preference.Preference
             android:key="settings_translate"
             android:title="@string/settings_translate"
-            android:summary="@string/settings_translate_url" />
+            android:summary="@string/settings_translate_url"
+            app:icon="@drawable/ic_translate_globe" />
 
         <androidx.preference.Preference
             android:key="settings_bug_report"
             android:title="@string/settings_bug_report"
-            android:summary="@string/settings_bug_report_url" />
+            android:summary="@string/settings_bug_report_url"
+            app:icon="@drawable/ic_bug_report_item" />
 
         <androidx.preference.Preference
             android:key="settings_patreon"
             android:title="@string/settings_patreon"
-            android:summary="@string/settings_patreon_url" />
+            android:summary="@string/settings_patreon_url"
+            app:icon="@drawable/ic_favorite_patreon" />
 
     </androidx.preference.PreferenceCategory>
 

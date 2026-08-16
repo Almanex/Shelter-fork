@@ -1,13 +1,8 @@
 apply plugin: 'com.android.application'
-
 repositories {
-    //noinspection JcenterRepositoryObsolete
-    jcenter {
-        content {
-            includeVersion "mobi.upod", "time-duration-picker", "1.1.3"
-        }
-    }
+    mavenCentral()
 }
+
 
 def getVersionCode = { ->
     try {
@@ -19,7 +14,7 @@ def getVersionCode = { ->
         return Integer.parseInt(stdout.toString().trim())
     }
     catch (ignored) {
-        return 1; // Default version code for non-git builds
+        return 1 // Default version code for non-git builds
     }
 }
 
@@ -38,12 +33,11 @@ def getVersionName = { ->
 }
 
 android {
-    compileSdk 36
-    buildToolsVersion = '36.0.0'
+    compileSdk 37
     defaultConfig {
         applicationId "net.typeblog.shelter"
         minSdkVersion 24
-        targetSdkVersion 36
+        targetSdkVersion 37
         versionCode getVersionCode()
         versionName getVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -61,11 +55,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.compilerArgs += ["-Xlint:deprecation", "-Xlint:unchecked"]
     }
     lint {
@@ -80,16 +74,16 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.core:core:1.15.0'
-    implementation 'androidx.activity:activity:1.9.0'
+    implementation 'androidx.core:core:1.19.0'
+    implementation 'androidx.activity:activity:1.13.0'
     implementation 'androidx.legacy:legacy-support-core-ui:1.0.0'
-    implementation 'androidx.fragment:fragment:1.8.4'
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.fragment:fragment:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
     implementation 'androidx.preference:preference:1.2.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
+    implementation 'com.google.android.material:material:1.14.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.6.0-alpha04'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.0-alpha01'
+    androidTestImplementation 'androidx.test:runner:1.7.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 }

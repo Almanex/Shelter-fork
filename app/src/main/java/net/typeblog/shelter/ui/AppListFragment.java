@@ -11,9 +11,9 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,9 +23,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -121,13 +122,32 @@ public class AppListFragment extends BaseFragment {
         return fragment;
     }
 
+    private IShelterService getService() {
+        if (mService != null) {
+            try {
+                mService.ping();
+                return mService;
+            } catch (Exception ignored) {
+                mService = null;
+            }
+        }
+        if (getActivity() instanceof MainActivity) {
+            mService = ((MainActivity) getActivity()).getService(mIsRemote);
+        }
+        return mService;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDefaultIcon = getActivity().getPackageManager().getDefaultActivityIcon();
-        IBinder service = getArguments().getBinder("service");
-        mService = IShelterService.Stub.asInterface(service);
-        mIsRemote = getArguments().getBoolean("is_remote");
+        if (getArguments() != null) {
+            IBinder service = getArguments().getBinder("service");
+            if (service != null) {
+                mService = IShelterService.Stub.asInterface(service);
+            }
+            mIsRemote = getArguments().getBoolean("is_remote");
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -166,11 +186,8 @@ public class AppListFragment extends BaseFragment {
         // Save the views
         mList = view.findViewById(R.id.fragment_list_recycler_view);
         mSwipeRefresh = view.findViewById(R.id.fragment_swipe_refresh);
-        mAdapter = new AppListAdapter(mService, mDefaultIcon);
-        mAdapter.setContextMenuHandler((info, v) -> {
-            mSelectedApp = info;
-            mList.showContextMenuForChild(v);
-        });
+        mAdapter = new AppListAdapter(getService(), mDefaultIcon);
+        mAdapter.setContextMenuHandler(this::showAppPopupMenu);
         if (mIsRemote) {
             // Allow multi-select actions if this is in the work profile
             // to allow things like multi-app unfreeze shortcuts
@@ -186,24 +203,36 @@ public class AppListFragment extends BaseFragment {
         mList.setLayoutManager(new LinearLayoutManager(getActivity()));
         mList.setHasFixedSize(true);
 
-        mSwipeRefresh.setOnRefreshListener(this::refresh);
-        registerForContextMenu(mList);
+        mSwipeRefresh.setOnRefreshListener(() -> refresh(true));
 
         return view;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        refresh(false);
+    }
+
     void refresh() {
-        if (mAdapter == null) return;
+        refresh(false);
+    }
+
+    void refresh(boolean showIndicator) {
+        IShelterService service = getService();
+        if (service == null || mAdapter == null) return;
         if (mRefreshing) return;
         if (mAdapter.isMultiSelectMode()) {
-            mSwipeRefresh.setRefreshing(false);
+            if (mSwipeRefresh != null) mSwipeRefresh.setRefreshing(false);
             return; // Disallow refreshing when we are multi-selecting
         }
         mRefreshing = true;
-        mSwipeRefresh.setRefreshing(true);
+        if (showIndicator && mSwipeRefresh != null) {
+            mSwipeRefresh.setRefreshing(true);
+        }
 
         try {
-            mService.getApps(new IGetAppsCallback.Stub() {
+            service.getApps(new IGetAppsCallback.Stub() {
                 @Override
                 public void callback(List<ApplicationInfoWrapper> apps) {
                     if (mIsRemote) {
@@ -212,11 +241,11 @@ public class AppListFragment extends BaseFragment {
 
                         // Update the cross-profile packages / widget providers list
                         try {
-                            mCrossProfileWidgetProviders.addAll(mService.getCrossProfileWidgetProviders());
+                            mCrossProfileWidgetProviders.addAll(service.getCrossProfileWidgetProviders());
 
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-                                mCrossProfilePackages.addAll(mService.getCrossProfilePackages());
-                        } catch (RemoteException ignored) {
+                                mCrossProfilePackages.addAll(service.getCrossProfilePackages());
+                        } catch (Exception ignored) {
 
                         }
                     }
@@ -227,14 +256,17 @@ public class AppListFragment extends BaseFragment {
                                 apps);
                     }
                     runOnUiThread(() -> {
-                        mSwipeRefresh.setRefreshing(false);
-                        mAdapter.setData(apps);
+                        if (mSwipeRefresh != null) mSwipeRefresh.setRefreshing(false);
+                        if (mAdapter != null) mAdapter.setData(apps);
                         mRefreshing = false;
                     });
                 }
             }, ((MainActivity) getActivity()).mShowAll);
-        } catch (RemoteException e) {
-            // Just... do nothing for now
+        } catch (Exception e) {
+            runOnUiThread(() -> {
+                if (mSwipeRefresh != null) mSwipeRefresh.setRefreshing(false);
+                mRefreshing = false;
+            });
         }
     }
 
@@ -284,10 +316,12 @@ public class AppListFragment extends BaseFragment {
         return true;
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        if (mSelectedApp == null) return;
+    private void showAppPopupMenu(ApplicationInfoWrapper info, View anchorView) {
+        if (info == null || getContext() == null) return;
+        mSelectedApp = info;
+
+        PopupMenu popup = new PopupMenu(requireContext(), anchorView);
+        Menu menu = popup.getMenu();
 
         if (mIsRemote) {
             if (!mSelectedApp.isSystem())
@@ -317,9 +351,7 @@ public class AppListFragment extends BaseFragment {
                         mCrossProfilePackages.contains(mSelectedApp.getPackageName()));
             }
 
-            // TODO: If we implement God Mode (i.e. Shelter as device owner), we should
-            // TODO: use two different lists to store auto freeze apps because we'll be
-            // TODO: able to freeze apps in main profile.
+            // Auto freeze apps in work profile
             MenuItem autoFreeze = menu.add(Menu.NONE, MENU_ITEM_AUTO_FREEZE, Menu.NONE, R.string.auto_freeze);
             autoFreeze.setCheckable(true);
             autoFreeze.setChecked(
@@ -336,56 +368,58 @@ public class AppListFragment extends BaseFragment {
             menu.add(Menu.NONE, MENU_ITEM_UNINSTALL, Menu.NONE, R.string.uninstall_app);
         }
 
-        if (menu.size() > 0) {
-            // Only set title when the menu is not empty
-            // this ensures that no menu will be shown
-            // if no operation available
-            menu.setHeaderTitle(
-                    getString(R.string.app_context_menu_title, mSelectedApp.getLabel()));
+        if (menu.size() == 0) {
+            mSelectedApp = null;
+            return;
         }
+
+        final ApplicationInfoWrapper selectedApp = info;
+        popup.setOnMenuItemClickListener(item -> handleMenuAction(item, selectedApp));
+        popup.setOnDismissListener(p -> mSelectedApp = null);
+        popup.show();
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if (mSelectedApp == null) return false;
+    private boolean handleMenuAction(MenuItem item, final ApplicationInfoWrapper selectedApp) {
+        if (selectedApp == null) return false;
 
         switch (item.getItemId()) {
             case MENU_ITEM_CLONE:
-                if (Utility.isMIUI() && !mSelectedApp.isSystem()) {
+                if (Utility.isMIUI() && !selectedApp.isSystem()) {
                     // Cannot clone non-system apps on MIUI
                     // Keep this variable intact when showing the dialog
-                    final ApplicationInfoWrapper selectedApp = mSelectedApp;
-                    new AlertDialog.Builder(getContext())
+                    new MaterialAlertDialogBuilder(requireContext())
                             .setMessage(R.string.miui_cannot_clone)
                             .setPositiveButton(android.R.string.ok, null)
                             .setNegativeButton(R.string.continue_anyway, (diag, button) ->
                                     installOrUninstall(selectedApp, true))
                             .show();
                 } else {
-                    installOrUninstall(mSelectedApp, true);
+                    installOrUninstall(selectedApp, true);
                 }
                 return true;
             case MENU_ITEM_UNINSTALL:
-                installOrUninstall(mSelectedApp, false);
+                installOrUninstall(selectedApp, false);
                 return true;
             case MENU_ITEM_FREEZE:
                 try {
-                    mService.freezeApp(mSelectedApp);
+                    IShelterService s = getService();
+                    if (s != null) s.freezeApp(selectedApp);
                 } catch (RemoteException e) {
 
                 }
                 Toast.makeText(getContext(),
-                        getString(R.string.freeze_success, mSelectedApp.getLabel()), Toast.LENGTH_SHORT).show();
+                        getString(R.string.freeze_success, selectedApp.getLabel()), Toast.LENGTH_SHORT).show();
                 refresh();
                 return true;
             case MENU_ITEM_UNFREEZE:
                 try {
-                    mService.unfreezeApp(mSelectedApp);
+                    IShelterService s = getService();
+                    if (s != null) s.unfreezeApp(selectedApp);
                 } catch (RemoteException e) {
 
                 }
                 Toast.makeText(getContext(),
-                        getString(R.string.unfreeze_success, mSelectedApp.getLabel()), Toast.LENGTH_SHORT).show();
+                        getString(R.string.unfreeze_success, selectedApp.getLabel()), Toast.LENGTH_SHORT).show();
                 refresh();
                 return true;
             case MENU_ITEM_LAUNCH:
@@ -394,24 +428,24 @@ public class AppListFragment extends BaseFragment {
                 // will work for both
                 Intent intent = new Intent(DummyActivity.UNFREEZE_AND_LAUNCH);
                 intent.setComponent(new ComponentName(getContext(), DummyActivity.class));
-                intent.putExtra("packageName", mSelectedApp.getPackageName());
+                intent.putExtra("packageName", selectedApp.getPackageName());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 DummyActivity.registerSameProcessRequest(intent);
                 startActivity(intent);
                 return true;
             case MENU_ITEM_CREATE_UNFREEZE_SHORTCUT:
-                loadIconAndAddUnfreezeShortcut(mSelectedApp, null);
+                loadIconAndAddUnfreezeShortcut(selectedApp, null);
                 return true;
             case MENU_ITEM_AUTO_FREEZE:
                 boolean orig = LocalStorageManager.getInstance().stringListContains(
-                        LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE, mSelectedApp.getPackageName());
+                        LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE, selectedApp.getPackageName());
 
                 if (!orig) {
                     LocalStorageManager.getInstance().appendStringList(
-                            LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE, mSelectedApp.getPackageName());
+                            LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE, selectedApp.getPackageName());
                 } else {
                     LocalStorageManager.getInstance().removeFromStringList(
-                            LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE, mSelectedApp.getPackageName());
+                            LocalStorageManager.PREF_AUTO_FREEZE_LIST_WORK_PROFILE, selectedApp.getPackageName());
                 }
                 return true;
             case MENU_ITEM_ALLOW_CROSS_PROFILE_WIDGET: {
@@ -449,10 +483,11 @@ public class AppListFragment extends BaseFragment {
             }
         }
 
-        return super.onContextItemSelected(item);
+        return false;
     }
 
     void installOrUninstall(final ApplicationInfoWrapper app, final boolean isInstall) {
+        if (app == null || getActivity() == null) return;
         mSelectedApp = null;
         IAppInstallCallback.Stub callback = new IAppInstallCallback.Stub() {
             @Override
@@ -463,14 +498,22 @@ public class AppListFragment extends BaseFragment {
         };
 
         try {
-            if (isInstall) {
-                ((MainActivity) getActivity()).getOtherService(mIsRemote)
-                        .installApp(app, callback);
-            } else {
-                mService.uninstallApp(app, callback);
+            IShelterService serviceToUse = isInstall
+                    ? ((MainActivity) getActivity()).getOtherService(mIsRemote)
+                    : getService();
+            if (serviceToUse != null) {
+                if (isInstall) {
+                    serviceToUse.installApp(app, callback);
+                } else {
+                    serviceToUse.uninstallApp(app, callback);
+                }
             }
-        } catch (RemoteException e) {
-            // TODO: Maybe tell the user?
+        } catch (DeadObjectException e) {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).rebindWorkService();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

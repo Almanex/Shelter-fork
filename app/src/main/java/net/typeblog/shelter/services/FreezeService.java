@@ -43,7 +43,7 @@ public class FreezeService extends Service {
     // We don't need to run this service in another process, so the static context should
     // be sufficient for this. DummyActivity will use these static methods to add more apps
     // to the list
-    private static List<String> sAppToFreeze = new ArrayList<>();
+    private static final List<String> sAppToFreeze = new ArrayList<>();
     public static synchronized void registerAppToFreeze(String app) {
         if (!sAppToFreeze.contains(app)) {
             sAppToFreeze.add(app);
@@ -51,7 +51,7 @@ public class FreezeService extends Service {
     }
 
     public static synchronized boolean hasPendingAppToFreeze() {
-        return sAppToFreeze.size() > 0;
+        return !sAppToFreeze.isEmpty();
     }
 
     // An app being inactive for this amount of time will be frozen
@@ -61,7 +61,7 @@ public class FreezeService extends Service {
     private static final int NOTIFICATION_ID = 0xe49c0;
 
     // The actual receiver of the screen-off event
-    private BroadcastReceiver mLockReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mLockReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Save usage statistics right now!
@@ -78,7 +78,7 @@ public class FreezeService extends Service {
             // Delay the work so that it can be canceled if the screen
             // gets unlocked before the delay passes
             // Use JobScheduler for Android 16+ compatibility
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mJobScheduler != null) {
+            if (mJobScheduler != null) {
                 scheduleFreezeJob();
             } else {
                 fallbackToAlarmManager();
@@ -89,10 +89,12 @@ public class FreezeService extends Service {
 
     // The receiver of the screen-on event
     // Cancels the freeze job if the designated delay has not passed
-    private BroadcastReceiver mUnlockReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mUnlockReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mAlarmManager.cancel(mFreezeWork);
+            if (mAlarmManager != null) {
+                mAlarmManager.cancel(mFreezeWork);
+            }
         }
     };
 
@@ -107,6 +109,7 @@ public class FreezeService extends Service {
 
     // Job scheduler for delayed work
     private JobScheduler mJobScheduler;
+    private AlarmManager mAlarmManager;
     private static final int FREEZE_JOB_ID = 1001;
     private static final String TAG = "FreezeService";
 
@@ -137,11 +140,9 @@ public class FreezeService extends Service {
                 null, mFreezeWork, null);
     }
 
-    private AlarmManager.OnAlarmListener mFreezeWork = () -> {
-        performFreezeWork();
-    };
+    private final AlarmManager.OnAlarmListener mFreezeWork = this::performFreezeWork;
     
-    public static void performFreezeWork(Context context) {
+    public static void performFreezeWork(Context ignored) {
         new FreezeService().performFreezeWork();
     }
     
@@ -150,17 +151,13 @@ public class FreezeService extends Service {
             // Cancel the unlock receiver first - the delay has passed if this work is executed
             unregisterReceiver(mUnlockReceiver);
 
-            if (sAppToFreeze.size() > 0) {
+            if (!sAppToFreeze.isEmpty()) {
                 DevicePolicyManager dpm = getSystemService(DevicePolicyManager.class);
                 ComponentName adminComponent = new ComponentName(FreezeService.this, ShelterDeviceAdminReceiver.class);
                 for (String app : sAppToFreeze) {
-                    boolean shouldFreeze = true;
-                    UsageStats stats =  mUsageStats.get(app);
-                    if (stats != null && mScreenLockTime - stats.getLastTimeUsed() <= APP_INACTIVE_TIMEOUT &&
-                            stats.getTotalTimeInForeground() >= APP_INACTIVE_TIMEOUT) {
-                        // Don't freeze foreground apps if requested
-                        shouldFreeze = false;
-                    }
+                    UsageStats stats = mUsageStats.get(app);
+                    boolean shouldFreeze = !(stats != null && mScreenLockTime - stats.getLastTimeUsed() <= APP_INACTIVE_TIMEOUT &&
+                            stats.getTotalTimeInForeground() >= APP_INACTIVE_TIMEOUT);
 
                     if (shouldFreeze) {
                         dpm.setApplicationHidden(adminComponent, app, true);
@@ -170,14 +167,13 @@ public class FreezeService extends Service {
             }
             stopSelf();
         }
-    };
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mJobScheduler = getSystemService(JobScheduler.class);
-        }
+        mJobScheduler = getSystemService(JobScheduler.class);
+        mAlarmManager = getSystemService(AlarmManager.class);
         // This is the only thing that we do
         registerReceiver(mLockReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
         // Use foreground notification to keep this service alive until screen is locked

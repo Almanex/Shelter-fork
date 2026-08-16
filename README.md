@@ -10,34 +10,38 @@
 
 ## Overview
 
-Shelter is a Free and Open-Source (FOSS) application that leverages the "Work Profile" feature of Android to provide an isolated space that you can install or clone apps into. 
+Shelter is a Free and Open-Source (FOSS) application that leverages the "Work Profile" feature of Android to provide an isolated space where you can install, isolate, or clone applications.
 
-This fork has been specifically adapted for Android 16 (API 36) with full support for Pixel 9a and modern Android features, including Edge-to-Edge UI, Material You dynamic color integration, and Predictive Back Navigation.
+This fork is modern, lightweight, and fully adapted for Android 16 (API 36) and Pixel devices. It incorporates modern Material 3 card-based aesthetics, Quick Settings tiles, native Photo Picker integration, seamless bidirectional file sharing, and eliminates legacy background overlay requirements.
 
 ## Key Features
 
-- **Work Profile Isolation**: Install apps inside an isolated profile to prevent them from accessing your main profile data.
-- **Freeze Inactive Apps**: Freeze background apps inside the work profile to prevent them from running, consuming battery, or waking up when not in use.
-- **App Cloning**: Run two separate instances of the same application on a single device.
-- **Android 16 Edge-to-Edge**: Full support for Android 16 mandatory edge-to-edge UI layouts.
-- **Predictive Back Navigation**: Smooth transitions and modern gesture navigation support.
-- **Pixel 9a Compatibility**: Screen layout and battery optimization tailored for the 6.3" display.
+- **Work Profile Isolation**: Install or clone applications inside an isolated sandbox, preventing them from accessing your personal data, contacts, or local storage.
+- **Quick Settings Tiles**: Control your environment directly from the Android notification shade with native Quick Settings tiles for "Freeze All" and "Work Profile (Quiet Mode)".
+- **Material 3 Redesign**: Card-based preference layout with rounded Material 3 cards, smooth `MaterialSwitch` controls, and vector icons.
+- **Android Photo Picker**: Secure, permissionless media selection via Android 13+ native Photo Picker with 1-tap cross-profile sharing.
+- **Bidirectional File Sharing**: Native cross-profile intent filters for system Share Sheet (`ACTION_SEND`) and Documents UI, replacing legacy File Shuttle and removing dangerous `SYSTEM_ALERT_WINDOW` or `MANAGE_EXTERNAL_STORAGE` permissions.
+- **Batch & Auto-Freezing**: Freeze background apps upon screen lock or instantly on demand via Quick Settings and launcher shortcuts.
+- **Android 16 Edge-to-Edge**: Full compliance with Android 16 mandatory edge-to-edge window insets and predictive back gesture navigation.
+- **Pixel 9a Optimization**: Refined layout, touch targets, and power management tailored for modern Pixel displays.
 
 ## Tech Stack
 
 | Layer / Component | Technology | Details / Purpose |
 | --- | --- | --- |
 | Operating System | Android | Target SDK 36 (Android 16), Min SDK 24 (Android 7.0) |
-| Programming Language | Java / AIDL | Main application logic and IPC |
-| Build System | Gradle (v8.6.0 plugin) | Project build automation |
-| UI Framework | Material Design | Android Jetpack (AppCompat, Preference, Material Components) |
+| Programming Language | Java / AIDL | Main application logic, IPC, and DPC administration |
+| Design System | Material Design 3 | Card-based preferences, MaterialSwitch, Dynamic Color (Material You) |
+| System Integration | Android Quick Settings | Native `TileService` implementations for profile and freeze controls |
+| Media & Storage | Android Photo Picker | Permissionless `PickVisualMedia` and bidirectional cross-profile filters |
+| Build System | Gradle (AGP 8.6+) | Automated Android Gradle build pipeline |
 
 ## Getting Started
 
 ### Prerequisites
-- JDK 17
-- Android SDK (API 36 Command-line tools or Android Studio)
-- An Android device running Android 16 (API 36) or higher for optimal compatibility.
+- JDK 17 (e.g. OpenJDK 17 or Android Studio bundled JBR)
+- Android SDK with Platform 36 and build-tools installed
+- An Android device or emulator running Android 14, 15, or 16.
 
 ### Installation & Running
 1. Clone the repository:
@@ -45,45 +49,45 @@ This fork has been specifically adapted for Android 16 (API 36) with full suppor
    git clone https://github.com/Almanex/Shelter-fork.git
    cd Shelter-fork
    ```
-2. Build the debug version:
+2. Build the debug APK:
    ```bash
    ./gradlew assembleDebug
    ```
-3. Install the APK to your device:
+3. Install to your connected device via ADB:
    ```bash
-   adb install app/build/outputs/apk/debug/app-debug.apk
+   adb install -r app/build/outputs/apk/debug/app-debug.apk
    ```
+
+For detailed user instructions, refer to the [User Guide](docs/GUIDE.md).
 
 ## Running the Tests
 
-To run the unit tests:
+To execute local unit tests:
 ```bash
 ./gradlew test
 ```
 
-To run instrumentation tests (requires a connected device or emulator):
+To run connected instrumentation tests:
 ```bash
 ./gradlew connectedAndroidTest
 ```
 
 ## Deployment
 
-To compile a production/release build of the application:
+To compile a signed production release:
 ```bash
 ./gradlew assembleRelease
 ```
-The compiled APK will be located in `app/build/outputs/apk/release/`.
+The output APK will be generated in `app/build/outputs/apk/release/`.
 
-Please note that for testing release builds on Android 16, they must be signed with a valid signature.
-
-### Windows Defender SmartScreen (for tools/build environment)
-When running compiled helper scripts or tools on Windows, users may see a Windows Defender SmartScreen warning due to unsigned scripts. To bypass:
+### Windows Defender SmartScreen
+When executing build utilities or scripts on Windows environments, SmartScreen may display a warning:
 - Click **More info**
 - Click **Run anyway**
 
 ## Contributing
 
-Contributions are welcome. Please read through the codebase guidelines and submit issues or pull requests on GitHub.
+Contributions, bug reports, and pull requests are welcome. Please ensure your code conforms to the project architecture, Material 3 standards, and retains zero-emoji technical documentation.
 
 ## License
 

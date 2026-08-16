@@ -29,6 +29,14 @@
         android:title="@string/install_app_to_profile" />
 
     <item
+        android:id="@+id/main_menu_photo_picker"
+        android:title="@string/main_menu_photo_picker" />
+
+    <item
+        android:id="@+id/main_menu_share_files"
+        android:title="@string/main_menu_share_files" />
+
+    <item
         android:id="@+id/main_menu_documents_ui"
         android:title="@string/documents_ui" />
 

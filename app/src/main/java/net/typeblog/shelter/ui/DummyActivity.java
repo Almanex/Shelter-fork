@@ -3,7 +3,6 @@ package net.typeblog.shelter.ui;
 import android.Manifest;
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -28,7 +27,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import net.typeblog.shelter.R;
@@ -36,8 +34,6 @@ import net.typeblog.shelter.ShelterApplication;
 import net.typeblog.shelter.receivers.ShelterDeviceAdminReceiver;
 import net.typeblog.shelter.services.FreezeService;
 import net.typeblog.shelter.services.IAppInstallCallback;
-import net.typeblog.shelter.services.IFileShuttleService;
-import net.typeblog.shelter.services.IFileShuttleServiceCallback;
 import net.typeblog.shelter.util.AuthenticationUtility;
 import net.typeblog.shelter.util.FileProviderProxy;
 import net.typeblog.shelter.util.InstallationProgressListener;
@@ -70,12 +66,6 @@ public class DummyActivity extends androidx.appcompat.app.AppCompatActivity {
     public static final String PUBLIC_UNFREEZE_AND_LAUNCH = "net.typeblog.shelter.action.PUBLIC_UNFREEZE_AND_LAUNCH";
     public static final String PUBLIC_FREEZE_ALL = "net.typeblog.shelter.action.PUBLIC_FREEZE_ALL";
     public static final String FREEZE_ALL_IN_LIST = "net.typeblog.shelter.action.FREEZE_ALL_IN_LIST";
-    // If we use the same intent for parent -> profile and profile -> parent, the user will
-    // be prompted with the action chooser with only one choice in it when the intent is
-    // forwarded by Utility.transferIntentToProfile()
-    // This is a bad experience, so we use two to avoid this.
-    public static final String START_FILE_SHUTTLE = "net.typeblog.shelter.action.START_FILE_SHUTTLE";
-    public static final String START_FILE_SHUTTLE_2 = "net.typeblog.shelter.action.START_FILE_SHUTTLE_2";
     public static final String SYNCHRONIZE_PREFERENCE = "net.typeblog.shelter.action.SYNCHRONIZE_PREFERENCE";
     public static final String PACKAGEINSTALLER_CALLBACK = "net.typeblog.shelter.action.PACKAGEINSTALLER_CALLBACK";
 
@@ -92,7 +82,6 @@ public class DummyActivity extends androidx.appcompat.app.AppCompatActivity {
             UNINSTALL_PACKAGE,
             UNFREEZE_AND_LAUNCH);
 
-    private static final int REQUEST_PERMISSION_EXTERNAL_STORAGE= 2;
     private static final int REQUEST_PERMISSION_POST_NOTIFICATIONS = 3;
 
     private static boolean sHasRequestedPermission = false;
@@ -213,8 +202,6 @@ public class DummyActivity extends androidx.appcompat.app.AppCompatActivity {
             actionPublicFreezeAll();
         } else if (FREEZE_ALL_IN_LIST.equals(intent.getAction())) {
             actionFreezeAllInList();
-        } else if (START_FILE_SHUTTLE.equals(intent.getAction()) || START_FILE_SHUTTLE_2.equals(intent.getAction())) {
-            actionStartFileShuttle();
         } else if (SYNCHRONIZE_PREFERENCE.equals(intent.getAction())) {
             actionSynchronizePreference();
         } else {
@@ -227,7 +214,7 @@ public class DummyActivity extends androidx.appcompat.app.AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        if (intent.getAction().equals(PACKAGEINSTALLER_CALLBACK)) {
+        if (PACKAGEINSTALLER_CALLBACK.equals(intent.getAction())) {
             int status = intent.getExtras().getInt(PackageInstaller.EXTRA_STATUS);
 
             switch (status) {
@@ -249,13 +236,7 @@ public class DummyActivity extends androidx.appcompat.app.AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_PERMISSION_EXTERNAL_STORAGE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                doStartFileShuttle();
-            } else {
-                finish();
-            }
-        } else if (requestCode == REQUEST_PERMISSION_POST_NOTIFICATIONS) {
+        if (requestCode == REQUEST_PERMISSION_POST_NOTIFICATIONS) {
             // Regardless of the result, continue initialization
             // This is fine because most functionalities will work anyway; it will just be a bit buggy
             // and unreliable.
@@ -377,8 +358,18 @@ public class DummyActivity extends androidx.appcompat.app.AppCompatActivity {
                 PackageInstaller.SessionParams.MODE_FULL_INSTALL);
         int sessionId = pi.createSession(params);
 
+        String appLabel = null;
+        if (getIntent().hasExtra("package")) {
+            String pkg = getIntent().getStringExtra("package");
+            try {
+                PackageManager pm = getPackageManager();
+                appLabel = pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString();
+            } catch (Exception ignored) {
+            }
+        }
+
         // Show the progress dialog first
-        pi.registerSessionCallback(new InstallationProgressListener(this, pi, sessionId));
+        pi.registerSessionCallback(new InstallationProgressListener(this, pi, sessionId, appLabel));
 
         PackageInstaller.Session session = pi.openSession(sessionId);
         doInstallPackageQ(uri, split_apks, session, () -> {
@@ -584,48 +575,6 @@ public class DummyActivity extends androidx.appcompat.app.AppCompatActivity {
         } else {
             finish();
         }
-    }
-
-    private void actionStartFileShuttle() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            // This requires the permission WRITE_EXTERNAL_STORAGE
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                doStartFileShuttle();
-            } else {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_EXTERNAL_STORAGE);
-            }
-        } else {
-            // The all file access permission should have been granted when enabling File Shuttle
-            // since Android R.
-            if (Utility.checkAllFileAccessPermission() && Utility.checkSystemAlertPermission(this)) {
-                doStartFileShuttle();
-            } else {
-                finish();
-            }
-        }
-    }
-
-    private void doStartFileShuttle() {
-        ((ShelterApplication) getApplication()).bindFileShuttleService(new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                IFileShuttleService shuttle = IFileShuttleService.Stub.asInterface(service);
-                IFileShuttleServiceCallback callback = IFileShuttleServiceCallback.Stub.asInterface(
-                        getIntent().getBundleExtra("extra").getBinder("callback"));
-                try {
-                    callback.callback(shuttle);
-                } catch (RemoteException e) {
-                    // Do Nothing
-                }
-
-                finish();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                // Do Nothing
-            }
-        });
     }
 
     private void actionSynchronizePreference() {

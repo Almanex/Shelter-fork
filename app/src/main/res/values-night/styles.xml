@@ -3,7 +3,7 @@
     <style name="AppTheme" parent="AppTheme.Override">
         <!-- Dark theme status and navigation bars -->
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
         
         <!-- Material Design 3 colors for dark theme (compatible with API 24+) -->
         <item name="colorPrimary">#90CAF9</item>
@@ -26,6 +26,10 @@
         <item name="colorOnSurface">#E6E1E5</item>
         <item name="colorSurfaceVariant">#49454F</item>
         <item name="colorOnSurfaceVariant">#CAC4D0</item>
+        <item name="colorSurfaceContainer">#1C202B</item>
+        <item name="colorSurfaceContainerHigh">#252B3A</item>
+        <item name="colorBackgroundFloating">#1C202B</item>
+        <item name="android:colorBackgroundFloating">#1C202B</item>
         
         <!-- Background colors -->
         <item name="android:colorBackground">#10131C</item>
@@ -34,7 +38,7 @@
         <!-- Enhanced edge-to-edge support for dark theme -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:enforceStatusBarContrast" tools:targetApi="api_level_35">false</item>
-        <item name="android:enforceNavigationBarContrast" tools:targetApi="api_level_35">false</item>
+        <item name="android:enforceStatusBarContrast" tools:targetApi="35">false</item>
+        <item name="android:enforceNavigationBarContrast" tools:targetApi="35">false</item>
     </style>
 </resources>

@@ -2,34 +2,50 @@ package net.typeblog.shelter.util;
 
 import android.app.Activity;
 import android.content.pm.PackageInstaller;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import net.typeblog.shelter.R;
 
 public class InstallationProgressListener extends PackageInstaller.SessionCallback {
     private AlertDialog mDialog;
-    private ProgressBar mProgress;
+    private LinearProgressIndicator mProgress;
     private int mSessionId;
     private PackageInstaller mPi;
+    private Handler mHandler = new Handler(Looper.getMainLooper());
 
     // Create a listener from an activity, and show a progress dialog for the sessionId
     // Only cares about the one sessionId provided here.
     // The caller is responsible for registering the callback;
     // however, this class will remove itself once the session has been finished.
     public InstallationProgressListener(Activity activity, PackageInstaller pi, int sessionId) {
+        this(activity, pi, sessionId, null);
+    }
+
+    public InstallationProgressListener(Activity activity, PackageInstaller pi, int sessionId, String appLabel) {
         mPi = pi;
+        mSessionId = sessionId;
 
-        ViewGroup layout = (ViewGroup) LayoutInflater.from(activity)
-                .inflate(R.layout.progress_dialog, (ViewGroup) activity.getWindow().getDecorView(), false);
+        View layout = LayoutInflater.from(activity)
+                .inflate(R.layout.progress_dialog, null, false);
         mProgress = layout.findViewById(R.id.progress);
+        TextView title = layout.findViewById(R.id.progress_dialog_title);
+        TextView subtitle = layout.findViewById(R.id.progress_dialog_subtitle);
 
-        mDialog = new AlertDialog.Builder(activity)
+        if (appLabel != null && !appLabel.isEmpty()) {
+            title.setText(appLabel);
+            subtitle.setText(R.string.app_installing);
+        }
+
+        mDialog = new MaterialAlertDialogBuilder(activity)
                 .setCancelable(false)
-                .setTitle(R.string.app_installing)
                 .setView(layout)
                 .create();
         mDialog.show();
@@ -52,7 +68,18 @@ public class InstallationProgressListener extends PackageInstaller.SessionCallba
 
     @Override
     public void onProgressChanged(int sessionId, float progress) {
-        mProgress.setProgress((int) (progress * 100));
+        if (sessionId != mSessionId) return;
+        mHandler.post(() -> {
+            if (mProgress != null) {
+                int p = (int) (progress * 100);
+                if (p > 0) {
+                    if (mProgress.isIndeterminate()) {
+                        mProgress.setIndeterminate(false);
+                    }
+                    mProgress.setProgressCompat(p, true);
+                }
+            }
+        });
     }
 
     @Override
@@ -61,7 +88,18 @@ public class InstallationProgressListener extends PackageInstaller.SessionCallba
             return;
         }
 
-        mDialog.hide();
-        mPi.unregisterSessionCallback(this);
+        mHandler.post(() -> {
+            try {
+                if (mDialog != null && mDialog.isShowing()) {
+                    mDialog.dismiss();
+                }
+            } catch (Exception ignored) {
+            }
+            try {
+                mPi.unregisterSessionCallback(this);
+            } catch (Exception ignored) {
+            }
+        });
     }
 }
+

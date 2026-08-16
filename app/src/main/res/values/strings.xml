@@ -119,4 +119,14 @@
 
     <!-- Formats -->
     <string name="format_minutes">%d min</string>
+    <string name="tile_freeze_all_label">Freeze All</string>
+    <string name="tile_work_profile_label">Work Profile</string>
+    <string name="tile_work_profile_state_on">Turned on</string>
+    <string name="tile_work_profile_state_off">Turned off</string>
+    <string name="tile_work_profile_not_setup">Not set up</string>
+    <string name="main_menu_photo_picker">Photo &amp; Media Picker</string>
+    <string name="main_menu_share_files">Share Files Cross-Profile</string>
+    <string name="share_to_cross_profile">Share Cross-Profile</string>
+    <string name="settings_cross_profile_sharing">Cross-Profile File &amp; Media Sharing</string>
+    <string name="settings_cross_profile_sharing_desc">Allow sharing files, photos, media, and documents between Personal and Shelter profiles via system Share Sheet and Pickers without dangerous permissions.</string>
 </resources>

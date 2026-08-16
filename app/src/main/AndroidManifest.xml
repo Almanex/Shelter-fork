@@ -13,15 +13,11 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:maxSdkVersion="25"
         android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.MODIFY_QUIET_MODE" />
     <uses-permission android:name="android.permission.BODY_SENSORS" 
         android:minSdkVersion="20" 
         android:maxSdkVersion="36" />
@@ -40,7 +36,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_egg_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:enableOnBackInvokedCallback="true">
 
         <!-- The main activity for UI -->
         <activity android:name=".ui.MainActivity"
@@ -67,7 +64,7 @@
         <activity android:name=".ui.DummyActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat.Translucent.NoTitleBar"
+            android:theme="@style/Theme.Shelter.Translucent"
             android:exported="true">
             <intent-filter>
                 <action android:name="net.typeblog.shelter.action.FINALIZE_PROVISION" />
@@ -94,7 +91,7 @@
         <activity android:name=".ui.FinalizeActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat.Translucent.NoTitleBar"
+            android:theme="@style/Theme.Shelter.Translucent"
             android:permission="android.permission.BIND_DEVICE_ADMIN"
             android:exported="true">
             <intent-filter>
@@ -129,30 +126,12 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <!-- A DocumentsProvider that lists files in another profile -->
-        <provider
-            android:name="net.typeblog.shelter.util.CrossProfileDocumentsProvider"
-            android:authorities="net.typeblog.shelter.documents"
-            android:grantUriPermissions="true"
-            android:permission="android.permission.MANAGE_DOCUMENTS"
-            android:exported="true"
-            android:enabled="false">
-            <intent-filter>
-                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
-            </intent-filter>
-        </provider>
-
         <!-- Core service running on both the main profile and the work profile -->
         <!-- Actions like cloning / freezing apps will be performed by this service -->
         <service android:name=".services.ShelterService"
                 android:exported="true"
                 android:foregroundServiceType="systemExempted"
                 android:permission="android.permission.BIND_DEVICE_ADMIN"/>
-
-        <!-- Service to forward file information between profiles -->
-        <service android:name=".services.FileShuttleService"
-                android:exported="true"
-                android:permission="android.permission.BIND_DEVICE_ADMIN" />
 
         <!-- A hack service to ensure every ShelterService is killed when App is removed -->
         <!-- from recent tasks -->
@@ -161,7 +140,8 @@
         <!-- Service to freeze apps on screen lock -->
         <service android:name=".services.FreezeService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="systemExempted" />
         
         <service android:name=".services.FreezeJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"
@@ -178,6 +158,29 @@
             </intent-filter>
             <meta-data android:name="android.nfc.cardemulation.host_apdu_service"
                 android:resource="@xml/payment_stub"/>
+        </service>
+
+        <!-- Quick Settings Tiles -->
+        <service
+            android:name=".services.FreezeAllTileService"
+            android:icon="@drawable/ic_freeze_tile"
+            android:label="@string/tile_freeze_all_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".services.WorkProfileTileService"
+            android:icon="@drawable/ic_work"
+            android:label="@string/tile_work_profile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
         </service>
 
     </application>

@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
     tools:context=".ui.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/main_appbar"
-        android:fitsSystemWindows="true"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:elevation="0dp"
@@ -16,36 +16,41 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/main_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/ToolbarTheme"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+            app:layout_scrollFlags="scroll|enterAlways" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/main_pager"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/main_appbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/main_bottom_navigation" />
+        app:layout_constraintBottom_toTopOf="@+id/main_tabs" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@id/main_bottom_navigation"
-        android:layout_width="match_parent"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/main_tabs"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorNavigationBar"
-        app:menu="@menu/bottom_navigation_menu"
-        app:itemBackground="@color/colorNavigationBar"
-        app:itemIconTint="@drawable/bottom_navigation_color_selector"
-        app:itemTextColor="@drawable/bottom_navigation_color_selector"
+        android:background="?attr/colorSurface"
+        app:tabGravity="fill"
+        app:tabMode="fixed"
+        app:tabIndicatorGravity="top"
+        app:tabIndicatorHeight="3dp"
+        app:tabIndicatorColor="?attr/colorSecondary"
+        app:tabIndicatorAnimationMode="elastic"
+        app:tabInlineLabel="false"
+        app:tabIconTint="@drawable/bottom_navigation_color_selector"
+        app:tabTextColor="@drawable/bottom_navigation_color_selector"
+        app:tabSelectedTextColor="?attr/colorSecondary"
+        app:elevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_pager"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

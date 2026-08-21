@@ -64,24 +64,6 @@
             android:summary="@string/settings_source_code_url"
             app:icon="@drawable/ic_code_branch" />
 
-        <androidx.preference.Preference
-            android:key="settings_translate"
-            android:title="@string/settings_translate"
-            android:summary="@string/settings_translate_url"
-            app:icon="@drawable/ic_translate_globe" />
-
-        <androidx.preference.Preference
-            android:key="settings_bug_report"
-            android:title="@string/settings_bug_report"
-            android:summary="@string/settings_bug_report_url"
-            app:icon="@drawable/ic_bug_report_item" />
-
-        <androidx.preference.Preference
-            android:key="settings_patreon"
-            android:title="@string/settings_patreon"
-            android:summary="@string/settings_patreon_url"
-            app:icon="@drawable/ic_favorite_patreon" />
-
     </androidx.preference.PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

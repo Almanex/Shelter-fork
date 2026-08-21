@@ -87,13 +87,13 @@
     <string name="settings_about">About</string>
     <string name="settings_version">Version</string>
     <string name="settings_source_code">Source Code</string>
-    <string name="settings_source_code_url" translatable="false">https://gitea.angry.im/PeterCxy/Shelter</string>
+    <string name="settings_source_code_url" translatable="false">https://github.com/Almanex/Shelter-fork</string>
     <string name="settings_translate">Translate</string>
-    <string name="settings_translate_url" translatable="false">https://weblate.typeblog.net/projects/shelter/shelter/</string>
+    <string name="settings_translate_url" translatable="false">https://github.com/Almanex/Shelter-fork</string>
     <string name="settings_bug_report">Bug Report / Issue Tracker</string>
-    <string name="settings_bug_report_url" translatable="false">https://lists.sr.ht/~petercxy/shelter</string>
+    <string name="settings_bug_report_url" translatable="false">https://github.com/Almanex/Shelter-fork/issues</string>
     <string name="settings_patreon" translatable="false">Patreon</string>
-    <string name="settings_patreon_url" translatable="false">https://www.patreon.com/PeterCxy</string>
+    <string name="settings_patreon_url" translatable="false">https://github.com/Almanex/Shelter-fork</string>
 
     <!-- Toast Long Texts -->
     <string name="provision_finished">Shelter setup complete. Now restarting Shelter. If Shelter didn\'t start automatically, you may launch it again from your launcher.</string>

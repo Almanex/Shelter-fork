@@ -33,9 +33,6 @@ import java.util.Arrays;
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener {
     private static final String SETTINGS_VERSION = "settings_version";
     private static final String SETTINGS_SOURCE_CODE = "settings_source_code";
-    private static final String SETTINGS_TRANSLATE = "settings_translate";
-    private static final String SETTINGS_BUG_REPORT = "settings_bug_report";
-    private static final String SETTINGS_PATREON = "settings_patreon";
     private static final String SETTINGS_CROSS_PROFILE_FILE_CHOOSER = "settings_cross_profile_file_chooser";
     private static final String SETTINGS_BLOCK_CONTACTS_SEARCHING = "settings_block_contacts_searching";
     private static final String SETTINGS_AUTO_FREEZE_SERVICE = "settings_auto_freeze_service";
@@ -88,12 +85,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 
         // Open source code url on click
         findPreference(SETTINGS_SOURCE_CODE)
-                .setOnPreferenceClickListener(this::openSummaryUrl);
-        findPreference(SETTINGS_BUG_REPORT)
-                .setOnPreferenceClickListener(this::openSummaryUrl);
-        findPreference(SETTINGS_PATREON)
-                .setOnPreferenceClickListener(this::openSummaryUrl);
-        findPreference(SETTINGS_TRANSLATE)
                 .setOnPreferenceClickListener(this::openSummaryUrl);
 
         // === Interactions ===

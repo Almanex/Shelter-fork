@@ -115,20 +115,16 @@ public class FreezeService extends Service {
 
     // Delayed work using JobScheduler for Android 16+ compatibility
     private void scheduleFreezeJob() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ComponentName jobComponent = new ComponentName(this, FreezeJobService.class);
-            JobInfo jobInfo = new JobInfo.Builder(FREEZE_JOB_ID, jobComponent)
-                    .setMinimumLatency(((long) SettingsManager.getInstance().getAutoFreezeDelay()) * 1000)
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_NONE)
-                    .setPersisted(false)
-                    .build();
-            
-            int result = mJobScheduler.schedule(jobInfo);
-            if (result != JobScheduler.RESULT_SUCCESS) {
-                Log.w(TAG, "Failed to schedule freeze job, falling back to AlarmManager");
-                fallbackToAlarmManager();
-            }
-        } else {
+        ComponentName jobComponent = new ComponentName(this, FreezeJobService.class);
+        JobInfo jobInfo = new JobInfo.Builder(FREEZE_JOB_ID, jobComponent)
+                .setMinimumLatency(((long) SettingsManager.getInstance().getAutoFreezeDelay()) * 1000)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_NONE)
+                .setPersisted(false)
+                .build();
+        
+        int result = mJobScheduler.schedule(jobInfo);
+        if (result != JobScheduler.RESULT_SUCCESS) {
+            Log.w(TAG, "Failed to schedule freeze job, falling back to AlarmManager");
             fallbackToAlarmManager();
         }
     }

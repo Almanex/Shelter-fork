@@ -58,7 +58,7 @@ public class ApplicationInfoWrapper implements Parcelable {
         return mInfo.sourceDir;
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.O)
     public String[] getSplitApks() {
         return mInfo.splitSourceDirs;
     }

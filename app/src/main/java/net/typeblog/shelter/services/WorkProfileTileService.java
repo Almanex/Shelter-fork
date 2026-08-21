@@ -96,10 +96,7 @@ public class WorkProfileTileService extends TileService {
     }
 
     private boolean isWorkProfileEnabled(UserManager um, UserHandle handle) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return !um.isQuietModeEnabled(handle);
-        }
-        return true;
+        return !um.isQuietModeEnabled(handle);
     }
 
     private void updateTileState() {

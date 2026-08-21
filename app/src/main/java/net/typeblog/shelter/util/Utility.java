@@ -1,6 +1,7 @@
 package net.typeblog.shelter.util;
 
 import android.annotation.TargetApi;
+import androidx.annotation.RequiresApi;
 import android.app.AppOpsManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -468,9 +469,11 @@ public class Utility {
     }
 
     // Check if all file access r/w is granted
-    @TargetApi(Build.VERSION_CODES.R)
     public static boolean checkAllFileAccessPermission() {
-        return Environment.isExternalStorageManager();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        }
+        return true;
     }
 
     // Check special access permission through AppOps
@@ -504,7 +507,6 @@ public class Utility {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @SuppressWarnings("deprecation")
     private static Notification buildNotificationLollipop(Context context, boolean important, String ticker, String title, String desc, int icon) {
         return new Notification.Builder(context)
@@ -516,7 +518,7 @@ public class Utility {
                 .build();
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     private static Notification buildNotificationOreo(Context context, boolean important, String ticker, String title, String desc, int icon) {
         String id = important ? NOTIFICATION_CHANNEL_IMPORTANT : NOTIFICATION_CHANNEL_ID;
         // Android O and later: Notification Channel

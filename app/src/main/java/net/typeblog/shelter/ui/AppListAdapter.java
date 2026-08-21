@@ -311,8 +311,8 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
             // Filter by search query
             mList.addAll(mOrigList.stream()
                     .filter((app) ->
-                            app.getPackageName().toLowerCase().contains(mSearchQuery)
-                                    || app.getLabel().toLowerCase().contains(mSearchQuery))
+                            app.getPackageName().toLowerCase(java.util.Locale.ROOT).contains(mSearchQuery)
+                                    || app.getLabel().toLowerCase(java.util.Locale.getDefault()).contains(mSearchQuery))
                     .collect(Collectors.toList()));
         }
         notifyDataSetChanged();

@@ -431,7 +431,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 Intent intent = new Intent(BROADCAST_SEARCH_FILTER_CHANGED);
-                intent.putExtra("text", newText.toLowerCase().trim());
+                intent.putExtra("text", newText.toLowerCase(java.util.Locale.getDefault()).trim());
                 LocalBroadcastManager.getInstance(MainActivity.this)
                         .sendBroadcast(intent);
                 return true;

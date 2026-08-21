@@ -1,6 +1,5 @@
 package net.typeblog.shelter.util;
 
-import android.annotation.TargetApi;
 import androidx.annotation.RequiresApi;
 import android.app.AppOpsManager;
 import android.app.Notification;

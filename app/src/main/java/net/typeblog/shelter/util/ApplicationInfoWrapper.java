@@ -1,6 +1,6 @@
 package net.typeblog.shelter.util;
 
-import android.annotation.TargetApi;
+import androidx.annotation.RequiresApi;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -58,7 +58,7 @@ public class ApplicationInfoWrapper implements Parcelable {
         return mInfo.sourceDir;
     }
 
-    @androidx.annotation.RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     public String[] getSplitApks() {
         return mInfo.splitSourceDirs;
     }

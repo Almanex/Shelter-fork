@@ -14,7 +14,7 @@
     <string name="device_admin_desc">App-Isolations-Dienst</string>
     <string name="device_admin_explanation">Shelter muss Geräte-Administrator werden, um Apps isolieren zu können.</string>
     <string name="notifications_important">Shelter - Achtung</string>
-    <string name="finish_provision_title">Klicken Sie hier, um die Installation von Shelter abzuschliessen</string>
+    <string name="finish_provision_title">Klicken Sie hier, um die Installation von Shelter abzuschließen</string>
     <string name="finish_provision_desc">Glückwunsch! Nur noch ein Klick und die Installation von Shelter ist abgeschlossen.</string>
     <string name="service_title">Shelter-Dienst</string>
     <string name="service_desc">Shelter läuft jetzt …</string>

@@ -374,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
             // Restart the activity if the services are no longer alive
             // This might be caused by KillerService being destroyed and
             // bringing all the other services with it
-            Intent intent = getIntent();
+            Intent intent = new Intent(this, MainActivity.class);
             finish();
             startActivity(intent);
         }

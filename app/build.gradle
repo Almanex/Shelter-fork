@@ -30,7 +30,7 @@ def getVersionName = { ->
         return stdout.toString().trim()
     }
     catch (ignored) {
-        return "1.0.0-android16"; // Default version name for non-git builds
+        return "1.0.0-android16" // Default version name for non-git builds
     }
 }
 

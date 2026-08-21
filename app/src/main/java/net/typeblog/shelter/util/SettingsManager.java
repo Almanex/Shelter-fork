@@ -53,6 +53,7 @@ public class SettingsManager {
     }
 
     // Read and apply the enabled state of the cross profile file chooser
+    @SuppressWarnings("EmptyMethod")
     public void applyCrossProfileFileChooser() {
         // Cross profile intent filters are configured through DevicePolicyManager
     }

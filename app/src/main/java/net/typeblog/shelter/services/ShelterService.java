@@ -1,5 +1,6 @@
 package net.typeblog.shelter.services;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
@@ -74,6 +75,7 @@ public class ShelterService extends Service {
         }
 
         @Override
+        @SuppressLint("QueryPermissionsNeeded")
         public void getApps(IGetAppsCallback callback, boolean showAll) {
             new Thread(() -> {
                 int pmFlags = PackageManager.MATCH_DISABLED_COMPONENTS | PackageManager.MATCH_UNINSTALLED_PACKAGES;

@@ -21,12 +21,14 @@ import net.typeblog.shelter.services.ILoadIconCallback;
 import net.typeblog.shelter.services.IShelterService;
 import net.typeblog.shelter.util.ApplicationInfoWrapper;
 
+import android.annotation.SuppressLint;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@SuppressLint("NotifyDataSetChanged")
 public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHolder> {
     class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView mIcon;

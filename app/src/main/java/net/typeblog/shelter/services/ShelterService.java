@@ -260,6 +260,7 @@ public class ShelterService extends Service {
         }
 
         @Override
+        @SuppressWarnings("deprecation")
         public boolean setCrossProfileWidgetProviderEnabled(String pkgName, boolean enabled) {
             if (!mIsProfileOwner)
                 throw new IllegalStateException("Cannot access cross-profile widget providers without being profile owner");

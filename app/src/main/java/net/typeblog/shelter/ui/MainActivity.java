@@ -232,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
         mBindWorkService.launch(intent);
     }
 
+    @SuppressWarnings("deprecation")
     private void bindWorkServiceCb(ActivityResult result) {
         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
             Bundle extra = result.getData().getBundleExtra("extra");

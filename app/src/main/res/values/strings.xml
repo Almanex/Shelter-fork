@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name" translatable="false">Shelter</string>
+    <string name="first_run_alert">You are about to set up Shelter.\n\nShelter uses Android\'s Work Profile feature to isolate apps.</string>
     <string name="first_run_alert_cancel">Bye</string>
     <string name="first_run_alert_continue">Continue</string>
+    <string name="device_admin_toast">You need to grant Device Admin permission for Shelter to work. Please try again.</string>
+    <string name="provision_still_pending">Please wait while we set up the Shelter profile for you…</string>
     <string name="setup_wizard_next">Next</string>
     <string name="setup_wizard_back">Back</string>
     <string name="device_admin_label" translatable="false">Shelter</string>

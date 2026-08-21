@@ -5,6 +5,7 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Ceramic Base Surface -->
     <path android:pathData="M0,0h108v108h-108z">
         <aapt:attr name="android:fillColor">
             <gradient
@@ -13,14 +14,42 @@
                 android:startY="0"
                 android:endX="108"
                 android:endY="108">
-                <item android:offset="0.0" android:color="#004D40"/>
-                <item android:offset="0.45" android:color="#00695C"/>
-                <item android:offset="1.0" android:color="#00897B"/>
+                <item android:offset="0.0" android:color="#FDFDFB"/>
+                <item android:offset="0.5" android:color="#F3F3EF"/>
+                <item android:offset="1.0" android:color="#E8E8E3"/>
             </gradient>
         </aapt:attr>
     </path>
-    <!-- Soft ambient inner lighting ring for Material 3 depth -->
+
+    <!-- Outer Bevel Rim for 3D Ceramic Dish Effect -->
     <path
         android:pathData="M54,18 A36,36 0 1,0 54,90 A36,36 0 1,0 54,18"
-        android:fillColor="#0DFFFFFF" />
+        android:fillColor="#E3E3DC" />
+
+    <!-- Recessed Dish Inner Center -->
+    <path
+        android:pathData="M54,20 A34,34 0 1,0 54,88 A34,34 0 1,0 54,20">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="54"
+                android:startY="20"
+                android:endX="54"
+                android:endY="88">
+                <item android:offset="0.0" android:color="#ECECE6"/>
+                <item android:offset="0.3" android:color="#F2F2EE"/>
+                <item android:offset="1.0" android:color="#FBFBF9"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Soft Top Inset Shadow Arc -->
+    <path
+        android:pathData="M22,50 C24,30 38,20 54,20 C70,20 84,30 86,50 C82,34 70,23 54,23 C38,23 26,34 22,50 Z"
+        android:fillColor="#15000000" />
+
+    <!-- Soft Bottom Inset Highlight Arc -->
+    <path
+        android:pathData="M23,58 C26,76 38,87 54,87 C70,87 82,76 85,58 C83,73 70,85 54,85 C38,85 25,73 23,58 Z"
+        android:fillColor="#40FFFFFF" />
 </vector>

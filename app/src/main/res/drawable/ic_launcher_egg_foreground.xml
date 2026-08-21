@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Ground / Base ambient shadow -->
+    <path
+        android:pathData="M32,86 C32,83 76,83 76,86 C76,89 32,89 32,86 Z"
+        android:fillColor="#33000000" />
+
+    <!-- Inner Chick / Safe Core -->
+    <path
+        android:pathData="M34,54 C34,36 74,36 74,54 C74,66 34,66 34,54 Z"
+        android:fillColor="#FFC107" />
+
+    <!-- Cheeks / Blush -->
+    <path
+        android:pathData="M37,53 A2.5,2.5 0 1,0 37,53.01"
+        android:fillColor="#FF8A80"
+        android:fillAlpha="0.6" />
+    <path
+        android:pathData="M71,53 A2.5,2.5 0 1,0 71,53.01"
+        android:fillColor="#FF8A80"
+        android:fillAlpha="0.6" />
+
+    <!-- Eyes -->
+    <path
+        android:pathData="M45,48 C45,45.5 48.5,45.5 48.5,48 C48.5,50.5 45,50.5 45,48 Z"
+        android:fillColor="#1E293B" />
+    <path
+        android:pathData="M46.2,46.8 A1,1 0 1,0 46.2,46.81"
+        android:fillColor="#FFFFFF" />
+
+    <path
+        android:pathData="M59.5,48 C59.5,45.5 63,45.5 63,48 C63,50.5 59.5,50.5 59.5,48 Z"
+        android:fillColor="#1E293B" />
+    <path
+        android:pathData="M60.7,46.8 A1,1 0 1,0 60.7,46.81"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Cute Beak -->
+    <path
+        android:pathData="M51.5,50.5 L56.5,50.5 L54,54 Z"
+        android:fillColor="#FF8F00" />
+
+    <!-- Top Egg Shell (Upper Cap) -->
+    <path
+        android:pathData="M54,23 C41,23 30.5,33 29,43 L37.5,39 L46,44.5 L54,38 L62,44.5 L70.5,39 L79,43 C77.5,33 67,23 54,23 Z"
+        android:fillColor="#FFFFFF" />
+    <!-- Soft rim shadow on upper cap -->
+    <path
+        android:pathData="M29,43 L37.5,39 L46,44.5 L54,38 L62,44.5 L70.5,39 L79,43 L79,44.5 L70.5,40.5 L62,46 L54,39.5 L46,46 L37.5,40.5 L29,44.5 Z"
+        android:fillColor="#E2E8F0" />
+
+    <!-- Bottom Egg Shell (Lower Base) -->
+    <path
+        android:pathData="M27.5,55 L36,60.5 L45,55 L54,61.5 L63,55 L72,60.5 L80.5,55 C79.5,73 68.5,85 54,85 C39.5,85 28.5,73 27.5,55 Z"
+        android:fillColor="#FFFFFF" />
+    <!-- Soft bottom 3D shadow on shell base -->
+    <path
+        android:pathData="M31,76 C36.5,82.5 44.8,85 54,85 C63.2,85 71.5,82.5 77,76 C70.5,81.5 62.5,83.5 54,83.5 C45.5,83.5 37.5,81.5 31,76 Z"
+        android:fillColor="#CBD5E1" />
+    <!-- Soft rim shadow on lower base -->
+    <path
+        android:pathData="M27.5,55 L36,60.5 L45,55 L54,61.5 L63,55 L72,60.5 L80.5,55 L80.5,56.5 L72,62 L63,56.5 L54,63 L45,56.5 L36,62 L27.5,56.5 Z"
+        android:fillColor="#E2E8F0" />
+</vector>

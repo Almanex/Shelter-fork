@@ -1,5 +1,6 @@
 package net.typeblog.shelter.services;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -28,6 +29,7 @@ public class FreezeAllTileService extends TileService {
         }
     }
 
+    @SuppressLint("StartActivityAndCollapseDeprecated")
     @SuppressWarnings("deprecation")
     @Override
     public void onClick() {

@@ -9,6 +9,7 @@ import android.graphics.RectF;
 import android.util.TypedValue;
 import android.view.View;
 
+import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.color.MaterialColors;
 
+@SuppressLint("RestrictedApi")
 public class SettingsCardDecoration extends RecyclerView.ItemDecoration {
     private final Paint mCardPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint mDividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

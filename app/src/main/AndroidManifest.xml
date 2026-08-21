@@ -17,7 +17,6 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.MODIFY_QUIET_MODE" />
     <uses-permission android:name="android.permission.BODY_SENSORS" 
         android:minSdkVersion="20" 
         android:maxSdkVersion="36" />

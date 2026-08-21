@@ -74,7 +74,6 @@
     </style>
 
     <style name="PreferenceCategoryStyle" parent="Preference.Category.Material">
-        <item name="android:layout">@layout/preference_category_material</item>
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:textStyle">bold</item>
         <item name="allowDividerBelow">false</item>

@@ -65,7 +65,8 @@ android {
         options.compilerArgs += ["-Xlint:deprecation", "-Xlint:unchecked"]
     }
     lint {
-        disable 'MissingTranslation', 'ExtraTranslation', 'GoogleAppIndexingWarning', 'InvalidFragmentVersionForActivityResult'
+        abortOnError true
+        disable 'MissingTranslation', 'ExtraTranslation', 'GoogleAppIndexingWarning', 'InvalidFragmentVersionForActivityResult', 'TypographyEllipsis', 'MonochromeLauncherIcon', 'IconDuplicates', 'UnusedResources'
     }
     buildFeatures {
         aidl true

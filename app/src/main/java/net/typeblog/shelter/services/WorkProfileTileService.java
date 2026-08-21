@@ -71,12 +71,13 @@ public class WorkProfileTileService extends TileService {
         }
 
         boolean isEnabled = isWorkProfileEnabled(um, workProfile);
-        Log.d(TAG, "onClick: isEnabled=" + isEnabled + ", requesting quiet mode=" + isEnabled);
-        try {
-            boolean res = um.requestQuietModeEnabled(isEnabled, workProfile);
-            Log.d(TAG, "onClick: requestQuietModeEnabled returned " + res);
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to toggle quiet mode", e);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            try {
+                boolean res = um.requestQuietModeEnabled(isEnabled, workProfile);
+                Log.d(TAG, "onClick: requestQuietModeEnabled returned " + res);
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to toggle quiet mode", e);
+            }
         }
         updateTileState();
     }
